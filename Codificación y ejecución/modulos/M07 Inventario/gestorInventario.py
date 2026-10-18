@@ -16,3 +16,16 @@ class gestorInventario:
         self.mapeoSedes = {}   # {nombre_sede: índice_fila}
         self.contadorRecursos = 0
         self.contadorSedes = 0
+
+    #Duplicar ek número de columnas de la matriz
+    def _redimensionarColumnas(self):
+        nuevaCapacidad = max (1, self.numRecursos * 2)
+        #Arreglo de tamaño fijo por fila
+        nuevaMatriz = [[0] * nuevaCapacidad for _ in range(self.numSedes)]
+        for i in range(self.numSedes):
+            for j in range(self.contadorRecursos):
+                nuevaMatriz[i][j] = self.matriz[i][j]
+        self.matriz = nuevaMatriz
+        self.numRecursos = nuevaCapacidad
+
+    
