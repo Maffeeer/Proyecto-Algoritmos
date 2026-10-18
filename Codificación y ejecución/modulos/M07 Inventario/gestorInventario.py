@@ -17,7 +17,7 @@ class gestorInventario:
         self.contadorRecursos = 0
         self.contadorSedes = 0
 
-    #Duplicar ek número de columnas de la matriz
+    #Duplicar el número de columnas de la matriz
     def _redimensionarColumnas(self):
         nuevaCapacidad = max (1, self.numRecursos * 2)
         #Arreglo de tamaño fijo por fila
@@ -27,5 +27,18 @@ class gestorInventario:
                 nuevaMatriz[i][j] = self.matriz[i][j]
         self.matriz = nuevaMatriz
         self.numRecursos = nuevaCapacidad
+
+    #Registra un recurso en el mapeo si no existe, y redimensiona la matriz si es necesario
+    def _registrarRecurso(self, codigoRecurso, nombreRecurso):
+        if codigoRecurso not in self.mapeoRecursos:
+            if self.contadorRecursos >= self.numRecursos:
+                self._redimensionarColumnas()
+            idx = self.contadorRecursos
+            self.mapeoRecursos[codigoRecurso] = idx
+            self.contadorRecursos += 1
+            return idx
+        return self.mapeoRecursos[codigoRecurso]
+
+    
 
     
