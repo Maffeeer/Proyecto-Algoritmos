@@ -162,5 +162,18 @@ class SistemaInteligente:
             'mensaje': f"Disponible en ~{int(duracionProm)} días ({int(confianza*100)}% confianza)"
         }
 
+    # Gamificación: Inicializa un usuario con sistema de gamificación
+    def crearUsuarioGamificado(self, codigoUsuario):
+        self.usuariosGamificados[codigoUsuario] = {
+            'puntos': 0,
+            'nivel': 1,
+            'badges': set(),
+            'prestamos': 0,
+            'devolucionesTiempo': 0
+        }
+
+
+
+
 
 
