@@ -1,5 +1,5 @@
 class Pila:
-    def _init_(self, capacidad_inicial=10):
+    def __init__(self, capacidad_inicial=10):
         """Inicializa pila vacía con capacidad inicial."""
         self.capacidad = capacidad_inicial
         self.datos = [None] * capacidad_inicial  # Arreglo preallocado
@@ -60,8 +60,8 @@ class Pila:
             resultado.append(self.datos[i])
         return resultado
 
-    def _str_(self):
+    def __str__(self):
         return f"Pila(tamaño={self.tope}, capacidad={self.capacidad})"
 
-    def _repr_(self):
-        return self._str_()
+    def __repr__(self):
+        return self.__str__()

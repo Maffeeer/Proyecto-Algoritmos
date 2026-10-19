@@ -1,6 +1,6 @@
 class NodoArbol:
 
-    def _init_(self, dato):
+    def __init__(self, dato):
         self.dato = dato
         self.izquierda = None
         self.derecha = None
@@ -8,7 +8,7 @@ class NodoArbol:
 
 class ArbolBinario:
 
-    def _init_(self):
+    def __init__(self):
         """Inicializa árbol vacío."""
         self.raiz = None
         self.tamaño = 0

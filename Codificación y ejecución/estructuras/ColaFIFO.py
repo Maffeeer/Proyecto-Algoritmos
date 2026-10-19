@@ -1,6 +1,6 @@
 class ColaFIFO:
 
-    def _init_(self, capacidadInicial=10):
+    def __init__(self, capacidadInicial=10):
         self.capacidad = capacidadInicial
         self.datos = [None] * capacidadInicial  # Arreglo preallocado
         self.inicio = 0
@@ -62,8 +62,8 @@ class ColaFIFO:
             resultado.append(self.datos[idx])
         return resultado
 
-    def _str_(self):
+    def __str__(self):
         return f"ColaFIFO(tamaño={self.tamaño}, capacidad={self.capacidad})"
 
-    def _repr_(self):
-        return self._str_()
+    def __repr__(self):
+        return self.__str__()
