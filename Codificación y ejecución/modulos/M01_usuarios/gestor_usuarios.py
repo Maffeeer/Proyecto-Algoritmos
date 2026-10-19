@@ -80,7 +80,7 @@ class GestorUsuarios:
         self.codigosUsados.clear()
 
     def __str__(self):
-        activos = self.obtenerCantidad_activos()
+        activos = self.obtenerCantidadActivos()
         total = self.obtenerCantidad()
         return f"GestorUsuarios(total={total}, activos={activos})"
            

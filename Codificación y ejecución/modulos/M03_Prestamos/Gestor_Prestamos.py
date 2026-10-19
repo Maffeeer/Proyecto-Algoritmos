@@ -24,19 +24,19 @@ class GestorPrestamos:
         self.recursosActivos = TablaHash(211)
  
     def _indexarActivo(self, p):
-        n = self.recursosActivos.buscar(p.codigoRecurso)
+        n = self.recursosActivos.buscar(p.recurso_codigo)
         if n is None:
             n = 0
-        self.recursosActivos.insertar(p.codigoRecurso, n + 1)
- 
+        self.recursosActivos.insertar(p.recurso_codigo, n + 1)
+
     def _desindexarActivo(self, p):
-        n = self.recursosActivos.buscar(p.codigoRecurso)
+        n = self.recursosActivos.buscar(p.recurso_codigo)
         if n is None:
             n = 0
         if n <= 1:
-            self.recursosActivos.eliminar(p.codigoRecurso)
+            self.recursosActivos.eliminar(p.recurso_codigo)
         else:
-            self.recursosActivos.insertar(p.codigoRecurso, n - 1)
+            self.recursosActivos.insertar(p.recurso_codigo, n - 1)
  
     def recursoPrestado(self, codigoRecurso):
         return self.recursosActivos.buscar(codigoRecurso) is not None
@@ -44,7 +44,7 @@ class GestorPrestamos:
     def registrarPrestamo(self, codigoUsuario, codigoRecurso, sede,
                            fechaPrestamo=None, diasLimite=14, _solicitud=None):
         if self.gestorUsuarios:
-            usuario = self.gestorUsuarios.buscarxCodigo(codigoUsuario)
+            usuario = self.gestorUsuarios.buscarUsuario(codigoUsuario)
             if usuario is None:
                 raise ValueError(f"Usuario {codigoUsuario} no existe")
             if not usuario.esActivo():
@@ -77,10 +77,10 @@ class GestorPrestamos:
         self._indexarActivo(prestamo)
  
         if self.gestorUsuarios:
-            usuario = self.gestorUsuarios.buscarxCodigo(codigoUsuario)
+            usuario = self.gestorUsuarios.buscarUsuario(codigoUsuario)
             if usuario:
                 usuario.registrarPrestamo(codigo)
- 
+
         self.pilaDeshacer.push({
             'operacion': 'registrar_prestamo',
             'prestamo': prestamo,
@@ -96,18 +96,18 @@ class GestorPrestamos:
         self._desindexarActivo(p)
  
         if self.gestorRecursos:
-            self.gestorRecursos.incrementarDisponibilidad(p.codigoRecurso, p.sede)
+            self.gestorRecursos.incrementarDisponibilidad(p.recurso_codigo, p.sede)
  
         if self.gestorUsuarios:
-            usuario = self.gestorUsuarios.buscarxCodigo(p.codigoUsuario)
+            usuario = self.gestorUsuarios.buscarUsuario(p.usuario_codigo)
             if usuario:
                 usuario.devolverPrestamo(codigoPrestamo)
- 
+
         self.pilaDeshacer.push({'operacion': 'registrarDevolucion', 'prestamo': p})
  
-        if self.gestorTurnos and self.gestorTurnos.obtenerCantidadEspera(p.codigoRecurso) > 0:
+        if self.gestorTurnos and self.gestorTurnos.obtenerCantidadEspera(p.recurso_codigo) > 0:
             try:
-                asignado = self.atenderSiguienteTurno(p.codigoRecurso, p.sede)
+                asignado = self.atenderSiguienteTurno(p.recurso_codigo, p.sede)
             except ValueError:
                 asignado = None
             if asignado:
@@ -124,11 +124,11 @@ class GestorPrestamos:
             if p.estado == "Activo":
                 self._desindexarActivo(p)
                 if self.gestorRecursos:
-                    self.gestorRecursos.incrementarDisponibilidad(p.codigoRecurso, p.sede)
+                    self.gestorRecursos.incrementarDisponibilidad(p.recurso_codigo, p.sede)
             self.indiceCodigo.eliminar(p.codigo)
  
             if self.gestorUsuarios:
-                usuario = self.gestorUsuarios.buscarxCodigo(p.codigoUsuario)
+                usuario = self.gestorUsuarios.buscarUsuario(p.usuario_codigo)
                 if usuario:
                     usuario.devolverPrestamo(p.codigo)
  
@@ -147,15 +147,15 @@ class GestorPrestamos:
             if solicitud is not None and self.gestorTurnos:
                 self.gestorTurnos.reinsertarAlFrente(solicitud)
         elif op['operacion'] == 'registrarDevolucion':
-            if self.gestorRecursos and not self.gestorRecursos.decrementarDisponibilidad(p.codigoRecurso, p.sede):
+            if self.gestorRecursos and not self.gestorRecursos.decrementarDisponibilidad(p.recurso_codigo, p.sede):
                 self.pilaDeshacer.push(op)
                 raise ValueError(f"No se puede deshacer la devolucion de {p.codigo}: "
-                                 f"no quedan unidades de {p.codigoRecurso} en {p.sede}")
+                                 f"no quedan unidades de {p.recurso_codigo} en {p.sede}")
             p.reactivar()
             self._indexarActivo(p)
  
             if self.gestorUsuarios:
-                usuario = self.gestorUsuarios.buscarxCodigo(p.codigoUsuario)
+                usuario = self.gestorUsuarios.buscarUsuario(p.usuario_codigo)
                 if usuario:
                     usuario.registrarPrestamo(p.codigo)
         return True
@@ -168,7 +168,7 @@ class GestorPrestamos:
             if sol is None:
                 return None
             if self.gestorUsuarios:
-                usuario = self.gestorUsuarios.buscarxCodigo(sol.codigoUsuario)
+                usuario = self.gestorUsuarios.buscarUsuario(sol.codigoUsuario)
                 if usuario is None or not usuario.esActivo():
                     sol.cancelar()
                     continue
@@ -192,10 +192,10 @@ class GestorPrestamos:
  
     def obtenerPrestamosUsuario(self, codigoUsuario):
         return [p for p in self.prestamos.recorrer()
-                if p.codigoUsuario == codigoUsuario and p.estado == "Activo"]
+                if p.usuario_codigo == codigoUsuario and p.estado == "Activo"]
  
     def obtenerPrestamosAtrasados(self, ahora=None):
-        return [p for p in self.prestamos.recorrer() if p.estaAtrasado(ahora)]
+        return [p for p in self.prestamos.recorrer() if p.esta_atrasado(ahora)]
  
     def obtenerPrestamosSede(self, sede):
         return [p for p in self.prestamos.recorrer() if p.sede == sede and p.estado == "Activo"]

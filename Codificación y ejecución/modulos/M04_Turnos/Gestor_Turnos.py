@@ -21,8 +21,8 @@ class GestorTurnos:
             cola = ColaFIFO()
             self.colas.insertar(codigoRecurso, cola)
 
-        self.contador =+ 1
-        codigo = f"S{self.contador: 04d}"
+        self.contador += 1
+        codigo = f"S{self.contador:04d}"
         solicitud = Solicitud(codigo, codigoUsuario, codigoRecurso)
         cola.encolar(solicitud)
         self.solicitudes.insertar(codigo, solicitud)
@@ -39,22 +39,22 @@ class GestorTurnos:
 
     def solicitarTurno(self, codigoUsuario, codigoRecurso, sede):
         if self.gestorUsuarios:
-            usuario = self.gestorUsuarios.buscarxCodigo(codigoUsuario)
+            usuario = self.gestorUsuarios.buscarUsuario(codigoUsuario)
             if usuario is None:
                 raise ValueError(f"Usuario {codigoUsuario} no existe")
             if not usuario.esActivo():
                 raise ValueError(f"El usuario {codigoUsuario} esta inactivo")
- 
+
         if self.gestorRecursos:
             recurso = self.gestorRecursos.buscarxCodigo(codigoRecurso)
             if recurso is None:
                 raise ValueError(f"Recurso {codigoRecurso} no existe")
-            if recurso.obtener_estado() == "Dado de baja":
+            if recurso.obtenerEstado() == "Dado de baja":
                 raise ValueError(f"El recurso {codigoRecurso} esta dado de baja")
-            sede_existe = any(s.nombre == sede for s in self.gestorRecursos.listar_sedes())
+            sede_existe = any(s.nombre == sede for s in self.gestorRecursos.listarSedes())
             if not sede_existe:
                 raise ValueError(f"Sede '{sede}' no existe")
-            if self.gestorRecursos.obtener_disponibilidad(codigoRecurso, sede) > 0:
+            if self.gestorRecursos.obtenerDisponibilidad(codigoRecurso, sede) > 0:
                 raise ValueError("Hay unidades disponibles: registre el préstamo")
  
         if self.estaEnEspera(codigoUsuario, codigoRecurso):
@@ -122,7 +122,7 @@ class GestorTurnos:
 
     def obtenerCantidad(self):
         total = 0
-        for codigoRecurso in self.colas.obtener_todas_las_claves():
+        for codigoRecurso in self.colas.obtenerTodasLasClaves():
             cola = self.colas.buscar(codigoRecurso)
             if cola is not None:
                 total += cola.obtenerTamaño()

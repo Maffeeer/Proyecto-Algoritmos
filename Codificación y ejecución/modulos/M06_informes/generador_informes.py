@@ -15,8 +15,8 @@ class Ordenamientos:
 
         if izq < der:
             p = Ordenamientos._particionar(arr, clave, izq, der)
-            Ordenamientos.quick_sort(arr, clave, izq, p - 1)
-            Ordenamientos.quick_sort(arr, clave, p + 1, der)
+            Ordenamientos.quickSort(arr, clave, izq, p - 1)
+            Ordenamientos.quickSort(arr, clave, p + 1, der)
         return arr
 
     @staticmethod
@@ -40,7 +40,7 @@ class GeneradorInformes:
     def generarReporteUso(self):
         if not self.gestorPrestamos:
             return "sin datos"
-        total = self.gestorPrestamos.obtener_cantidad()
+        total = self.gestorPrestamos.obtenerCantidad()
         return f"total de préstamos registrados: {total}"
 
     def generarReporteInventario(self):

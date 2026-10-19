@@ -34,4 +34,4 @@ class GestorCategorias:
         return self.categorias.buscar(codigo)
 
     def obtenerCantidad(self):
-        return self.categorias.obtener_cantidad()
+        return self.categorias.obtenerCantidad()

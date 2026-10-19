@@ -417,36 +417,36 @@ def gestionPrestamos(gestorPrestamos, gestorUsuarios, gestorRecursos):
             print(f"\nTotal prestamos activos: {activos.obtenerTamaño()}\n")
             for i in range(activos.obtenerTamaño()):
                 p = activos.obtener(i)
-                print(f"  {p.codigo}: {p.usuarioCodigo} -> {p.recursoCodigo} [{p.sede}]")
+                print(f"  {p.codigo}: {p.usuario_codigo} -> {p.recurso_codigo} [{p.sede}]")
 
         elif opcion == "4":
             prestamos = gestorPrestamos.obtenerPrestamosAtrasados()
             print(f"\nTotal prestamos ATRASADOS: {len(prestamos)}\n")
             for p in prestamos:
                 dias_atraso = p.dias_atraso()
-                print(f"  {p.codigo}: {p.usuarioCodigo} -> {p.recursoCodigo} [{dias_atraso} días atraso]")
+                print(f"  {p.codigo}: {p.usuario_codigo} -> {p.recurso_codigo} [{dias_atraso} días atraso]")
 
         elif opcion == "5":
             usuarioCod = input("\nCodigo usuario: ")
             prestamos = gestorPrestamos.obtenerPrestamosUsuario(usuarioCod)
             print(f"\nPrestamos de {usuarioCod}: {len(prestamos)}\n")
             for p in prestamos:
-                print(f"  {p.codigo}: {p.recursoCodigo} [{p.estado}]")
+                print(f"  {p.codigo}: {p.recurso_codigo} [{p.estado}]")
 
         elif opcion == "6":
             sede = input("\nSede (Centro/Norte/Sur): ")
             prestamos = gestorPrestamos.obtenerPrestamosSede(sede)
             print(f"\nPrestamos en {sede}: {len(prestamos)}\n")
             for p in prestamos:
-                print(f"  {p.codigo}: {p.usuarioCodigo} -> {p.recursoCodigo}")
+                print(f"  {p.codigo}: {p.usuario_codigo} -> {p.recurso_codigo}")
 
         elif opcion == "7":
             codigo = input("\nCodigo prestamo: ")
             prestamo = gestorPrestamos.buscarPrestamo(codigo)
             if prestamo:
-                print(f"\n{prestamo.codigo}: {prestamo.usuarioCodigo} -> {prestamo.recursoCodigo}")
+                print(f"\n{prestamo.codigo}: {prestamo.usuario_codigo} -> {prestamo.recurso_codigo}")
                 print(f"Sede: {prestamo.sede}")
-                print(f"Fecha: {prestamo.fechaPrestamo.strftime('%Y-%m-%d %H:%M')}")
+                print(f"Fecha: {prestamo.fecha_prestamo.strftime('%Y-%m-%d %H:%M')}")
                 print(f"Estado: {prestamo.estado}")
                 if prestamo.esta_atrasado():
                     print(f"ATRASADO: {prestamo.dias_atraso()} días")
@@ -473,7 +473,7 @@ def gestionInventario(gestor):
     print()
     print("Disponibilidad por sede y recurso:")
     print()
-    print(gestor.inventario.mostrar_matriz())
+    print(gestor.inventario.mostrarMatriz())
     pausa()
 
 
@@ -500,8 +500,8 @@ def gestionTurnos(gestorTurnos):
             break
         elif opcion == "1":
             recurso = input("\nCodigo recurso: ")
-            # ver_siguiente solo consulta; obtener_siguiente sacaba al usuario de la fila
-            siguiente = gestorTurnos.ver_siguiente(recurso)
+            # verSiguiente solo consulta; obtenerSiguiente saca al usuario de la fila
+            siguiente = gestorTurnos.verSiguiente(recurso)
             if siguiente:
                 print(f"\nSiguiente en fila: {siguiente.usuarioCodigo} (turno {siguiente.codigo})")
             else:
