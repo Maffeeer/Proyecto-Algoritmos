@@ -19,9 +19,9 @@ def primoSiguiente(n):
 
 
 class _Nodo:
-    _slots_ = ("clave", "valor", "sig")
+    __slots__ = ("clave", "valor", "sig")
 
-    def _init_(self, clave, valor, sig=None):
+    def __init__(self, clave, valor, sig=None):
         self.clave = clave
         self.valor = valor
         self.sig = sig
@@ -31,7 +31,7 @@ class TablaHash:
 
     FACTOR_MAX = 0.75
 
-    def _init_(self, capacidad=211):
+    def __init__(self, capacidad=211):
         self.capacidad = primoSiguiente(capacidad)
         self.cubetas = [None] * self.capacidad
         self.tamaño = 0
@@ -115,10 +115,10 @@ class TablaHash:
         for _, v in self.items():
             yield v
 
-    def _len_(self):
+    def __len__(self):
         return self.tamaño
 
-    def _contains_(self, clave):
+    def __contains__(self, clave):
         return self.contiene(clave)
 
     # ---- análisis de colisiones (para el informe) ----
@@ -143,13 +143,13 @@ class TablaHash:
             "cadenaPromedio": round(self.tamaño / ocupadas, 3) if ocupadas else 0,
         }
 
-    def _str_(self):
+    def __str__(self):
         return f"TablaHash({self.estadisticas()})"
 
 
 class ConjuntoHash:
 
-    def _init_(self, capacidad=211):
+    def __init__(self, capacidad=211):
         self._t = TablaHash(capacidad)
 
     def agregar(self, elemento):
@@ -164,8 +164,8 @@ class ConjuntoHash:
     def elementos(self):
         return list(self._t.claves())
 
-    def _len_(self):
+    def __len__(self):
         return len(self._t)
 
-    def _contains_(self, elemento):
+    def __contains__(self, elemento):
         return self.contiene(elemento)

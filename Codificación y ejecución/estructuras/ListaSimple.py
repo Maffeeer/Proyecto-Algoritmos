@@ -1,16 +1,16 @@
 class NodoSimple:
 
-    def _init_(self, dato):
+    def __init__(self, dato):
         self.dato = dato
         self.siguiente = None
 
-    def _str_(self):
+    def __str__(self):
         return f"NodoSimple({self.dato})"
 
 
 class ListaSimple:
 
-    def _init_(self):
+    def __init__(self):
         """Inicializa lista vacía."""
         self.cabeza = None
         self.tamaño = 0
@@ -97,8 +97,8 @@ class ListaSimple:
         self.cabeza = None
         self.tamaño = 0
 
-    def _str_(self):
+    def __str__(self):
         return f"ListaSimple({self.recorrer()})"
 
-    def _repr_(self):
-        return self._str_()
+    def __repr__(self):
+        return self.__str__()

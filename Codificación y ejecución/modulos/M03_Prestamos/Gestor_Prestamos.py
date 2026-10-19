@@ -1,0 +1,212 @@
+from estructuras import VectorDinamico, ListaSimple, ListaDoble, Pila, TablaHash
+from .prestamo import Prestamo
+
+
+def _num(codigo):
+    return int(str(codigo)[1:])
+
+class SinUnidadesError(ValueError):
+    pass
+
+
+class GestorPrestamos:
+ 
+    def __init__(self, gestor_turnos=None, gestor_usuarios=None, gestor_recursos=None):
+        self.prestamos = VectorDinamico(capacidad_inicial=50)
+        self.historial_simple = ListaSimple()
+        self.historial_doble = ListaDoble()
+        self.pila_deshacer = Pila()
+        self.contador_codigos = 0
+        self.gestor_turnos = gestor_turnos
+        self.gestor_usuarios = gestor_usuarios
+        self.gestor_recursos = gestor_recursos
+        self.indice_codigo = TablaHash(211)
+        self.recursos_activos = TablaHash(211)
+ 
+    def _indexar_activo(self, p):
+        n = self.recursos_activos.buscar(p.recurso_codigo)
+        if n is None:
+            n = 0
+        self.recursos_activos.insertar(p.recurso_codigo, n + 1)
+ 
+    def _desindexar_activo(self, p):
+        n = self.recursos_activos.buscar(p.recurso_codigo)
+        if n is None:
+            n = 0
+        if n <= 1:
+            self.recursos_activos.eliminar(p.recurso_codigo)
+        else:
+            self.recursos_activos.insertar(p.recurso_codigo, n - 1)
+ 
+    def recurso_prestado(self, recurso_codigo):
+        return self.recursos_activos.buscar(recurso_codigo) is not None
+ 
+    def registrar_prestamo(self, usuario_codigo, recurso_codigo, sede,
+                           fecha_prestamo=None, dias_limite=14, _solicitud=None):
+        if self.gestor_usuarios:
+            usuario = self.gestor_usuarios.buscar_por_codigo(usuario_codigo)
+            if usuario is None:
+                raise ValueError(f"Usuario {usuario_codigo} no existe")
+            if not usuario.es_activo():
+                raise ValueError(f"El usuario {usuario_codigo} esta inactivo")
+ 
+        if self.gestor_recursos:
+            recurso = self.gestor_recursos.buscar_por_codigo(recurso_codigo)
+            if recurso is None:
+                raise ValueError(f"Recurso {recurso_codigo} no existe")
+            if recurso.obtener_estado() == "Dado de baja":
+                raise ValueError(f"El recurso {recurso_codigo} esta dado de baja")
+ 
+            sedes = self.gestor_recursos.listar_sedes()
+            sede_existe = any(s.nombre == sede for s in sedes)
+            if not sede_existe:
+                raise ValueError(f"Sede '{sede}' no existe")
+ 
+            if not self.gestor_recursos.decrementar_disponibilidad(recurso_codigo, sede):
+                raise SinUnidadesError(f"Sin unidades disponibles de {recurso_codigo} en {sede}")
+            
+        self.contador_codigos += 1
+        codigo = f"P{self.contador_codigos:04d}"
+        prestamo = Prestamo(codigo, usuario_codigo, recurso_codigo, sede,
+                            fecha_prestamo, dias_limite)
+ 
+        self.prestamos.agregar(prestamo)
+        self.historial_simple.agregar_al_final(prestamo)
+        self.historial_doble.agregar_al_final(prestamo)
+        self.indice_codigo.insertar(codigo, prestamo)
+        self._indexar_activo(prestamo)
+ 
+        if self.gestor_usuarios:
+            usuario = self.gestor_usuarios.buscar_por_codigo(usuario_codigo)
+            if usuario:
+                usuario.registrar_prestamo(codigo)
+ 
+        self.pila_deshacer.push({
+            'operacion': 'registrar_prestamo',
+            'prestamo': prestamo,
+            'solicitud': _solicitud,
+        })
+        return codigo
+
+    def registrar_devolucion(self, codigo_prestamo):
+        p = self.indice_codigo.buscar(codigo_prestamo)
+        if p is None or p.estado != "Activo":
+            return False
+        p.devolver()
+        self._desindexar_activo(p)
+ 
+        if self.gestor_recursos:
+            self.gestor_recursos.incrementar_disponibilidad(p.recurso_codigo, p.sede)
+ 
+        if self.gestor_usuarios:
+            usuario = self.gestor_usuarios.buscar_por_codigo(p.usuario_codigo)
+            if usuario:
+                usuario.devolver_prestamo(codigo_prestamo)
+ 
+        self.pila_deshacer.push({'operacion': 'registrar_devolucion', 'prestamo': p})
+ 
+        if self.gestor_turnos and self.gestor_turnos.obtener_cantidad_espera(p.recurso_codigo) > 0:
+            try:
+                asignado = self.atender_siguiente_turno(p.recurso_codigo, p.sede)
+            except ValueError:
+                asignado = None
+            if asignado:
+                return asignado
+        return True
+
+    def deshacer(self):
+        op = self.pila_deshacer.pop()
+        if op is None:
+            return False
+ 
+        p = op['prestamo']
+        if op['operacion'] == 'registrar_prestamo':
+            if p.estado == "Activo":
+                self._desindexar_activo(p)
+                if self.gestor_recursos:
+                    self.gestor_recursos.incrementar_disponibilidad(p.recurso_codigo, p.sede)
+            self.indice_codigo.eliminar(p.codigo)
+ 
+            if self.gestor_usuarios:
+                usuario = self.gestor_usuarios.buscar_por_codigo(p.usuario_codigo)
+                if usuario:
+                    usuario.devolver_prestamo(p.codigo)
+ 
+            restantes = [x for x in self.prestamos.recorrer() if x is not p]
+            self.prestamos = VectorDinamico(capacidad_inicial=50)
+            self.historial_simple = ListaSimple()
+            self.historial_doble = ListaDoble()
+            for x in restantes:
+                self.prestamos.agregar(x)
+                self.historial_simple.agregar_al_final(x)
+                self.historial_doble.agregar_al_final(x)
+            if _num(p.codigo) == self.contador_codigos:
+                self.contador_codigos -= 1
+ 
+            solicitud = op.get('solicitud')
+            if solicitud is not None and self.gestor_turnos:
+                self.gestor_turnos.reinsertar_al_frente(solicitud)
+        elif op['operacion'] == 'registrar_devolucion':
+            if self.gestor_recursos and not self.gestor_recursos.decrementar_disponibilidad(p.recurso_codigo, p.sede):
+                self.pila_deshacer.push(op)
+                raise ValueError(f"No se puede deshacer la devolucion de {p.codigo}: "
+                                 f"no quedan unidades de {p.recurso_codigo} en {p.sede}")
+            p.reactivar()
+            self._indexar_activo(p)
+ 
+            if self.gestor_usuarios:
+                usuario = self.gestor_usuarios.buscar_por_codigo(p.usuario_codigo)
+                if usuario:
+                    usuario.registrar_prestamo(p.codigo)
+        return True
+
+    def atender_siguiente_turno(self, recurso_codigo, sede):
+        if self.gestor_turnos is None:
+            raise ValueError("GestorPrestamos no tiene GestorTurnos asociado")
+        while True:
+            sol = self.gestor_turnos.obtener_siguiente(recurso_codigo)
+            if sol is None:
+                return None
+            if self.gestor_usuarios:
+                usuario = self.gestor_usuarios.buscar_por_codigo(sol.usuario_codigo)
+                if usuario is None or not usuario.es_activo():
+                    sol.cancelar()
+                    continue
+            try:
+                return self.registrar_prestamo(sol.usuario_codigo, recurso_codigo, sede,
+                                               _solicitud=sol)
+            except ValueError:
+                self.gestor_turnos.reinsertar_al_frente(sol)
+                raise
+
+    def listar_activos(self):
+        activos = VectorDinamico(capacidad_inicial=10)
+        for i in range(self.prestamos.obtener_tamaño()):
+            p = self.prestamos.obtener(i)
+            if p.estado == "Activo":
+                activos.agregar(p)
+        return activos
+ 
+    def buscar_prestamo(self, codigo):
+        return self.indice_codigo.buscar(codigo)
+ 
+    def obtener_prestamos_usuario(self, usuario_codigo):
+        return [p for p in self.prestamos.recorrer()
+                if p.usuario_codigo == usuario_codigo and p.estado == "Activo"]
+ 
+    def obtener_prestamos_atrasados(self, ahora=None):
+        return [p for p in self.prestamos.recorrer() if p.esta_atrasado(ahora)]
+ 
+    def obtener_prestamos_sede(self, sede):
+        return [p for p in self.prestamos.recorrer() if p.sede == sede and p.estado == "Activo"]
+ 
+    def listar_todos(self):
+        return self.prestamos.recorrer()
+ 
+    def obtener_cantidad(self):
+        return self.prestamos.obtener_tamaño()
+ 
+    def __str__(self):
+        activos = len([p for p in self.prestamos.recorrer() if p.estado == "Activo"])
+        return f"GestorPrestamos(total={self.obtener_cantidad()}, activos={activos})"
+ 
