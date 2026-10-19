@@ -113,3 +113,49 @@ class GestorPrestamos:
             if asignado:
                 return asignado
         return True
+
+    def deshacer(self):
+        op = self.pila_deshacer.pop()
+        if op is None:
+            return False
+ 
+        p = op['prestamo']
+        if op['operacion'] == 'registrar_prestamo':
+            if p.estado == "Activo":
+                self._desindexar_activo(p)
+                if self.gestor_recursos:
+                    self.gestor_recursos.incrementar_disponibilidad(p.recurso_codigo, p.sede)
+            self.indice_codigo.eliminar(p.codigo)
+ 
+            if self.gestor_usuarios:
+                usuario = self.gestor_usuarios.buscar_por_codigo(p.usuario_codigo)
+                if usuario:
+                    usuario.devolver_prestamo(p.codigo)
+ 
+            restantes = [x for x in self.prestamos.recorrer() if x is not p]
+            self.prestamos = VectorDinamico(capacidad_inicial=50)
+            self.historial_simple = ListaSimple()
+            self.historial_doble = ListaDoble()
+            for x in restantes:
+                self.prestamos.agregar(x)
+                self.historial_simple.agregar_al_final(x)
+                self.historial_doble.agregar_al_final(x)
+            if _num(p.codigo) == self.contador_codigos:
+                self.contador_codigos -= 1
+ 
+            solicitud = op.get('solicitud')
+            if solicitud is not None and self.gestor_turnos:
+                self.gestor_turnos.reinsertar_al_frente(solicitud)
+        elif op['operacion'] == 'registrar_devolucion':
+            if self.gestor_recursos and not self.gestor_recursos.decrementar_disponibilidad(p.recurso_codigo, p.sede):
+                self.pila_deshacer.push(op)
+                raise ValueError(f"No se puede deshacer la devolucion de {p.codigo}: "
+                                 f"no quedan unidades de {p.recurso_codigo} en {p.sede}")
+            p.reactivar()
+            self._indexar_activo(p)
+ 
+            if self.gestor_usuarios:
+                usuario = self.gestor_usuarios.buscar_por_codigo(p.usuario_codigo)
+                if usuario:
+                    usuario.registrar_prestamo(p.codigo)
+        return True
