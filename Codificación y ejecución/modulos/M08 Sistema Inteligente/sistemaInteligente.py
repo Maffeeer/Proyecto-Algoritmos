@@ -110,3 +110,23 @@ class SistemaInteligente:
                 cantidad += 1
 
         return suma / cantidad if cantidad > 0 else 0.0
+
+    # Obtiene el ranking de recursos basado en calificaciones y número de reviews
+    def rankingRecursos(self, top_n=10):
+        recursos = {}
+
+        for i in range(self.calificaciones.obtenerTamaño()):
+            cal = self.calificaciones.obtener(i)
+            recurso = cal['recurso']
+            if recurso not in recursos:
+                recursos[recurso] = []
+            recursos[recurso].append(cal['estrellas'])
+
+        ranking = []
+        for recurso, estrellasList in recursos.items():
+            promedio = sum(estrellasList) / len(estrellasList)
+            ranking.append((recurso, promedio, len(estrellasList)))
+
+        ranking.sort(key=lambda x: (x[1], x[2]), reverse=True)
+        return ranking[:top_n]
+
