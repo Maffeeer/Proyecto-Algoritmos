@@ -87,3 +87,29 @@ class GestorPrestamos:
             'solicitud': _solicitud,
         })
         return codigo
+
+    def registrar_devolucion(self, codigo_prestamo):
+        p = self.indice_codigo.buscar(codigo_prestamo)
+        if p is None or p.estado != "Activo":
+            return False
+        p.devolver()
+        self._desindexar_activo(p)
+ 
+        if self.gestor_recursos:
+            self.gestor_recursos.incrementar_disponibilidad(p.recurso_codigo, p.sede)
+ 
+        if self.gestor_usuarios:
+            usuario = self.gestor_usuarios.buscar_por_codigo(p.usuario_codigo)
+            if usuario:
+                usuario.devolver_prestamo(codigo_prestamo)
+ 
+        self.pila_deshacer.push({'operacion': 'registrar_devolucion', 'prestamo': p})
+ 
+        if self.gestor_turnos and self.gestor_turnos.obtener_cantidad_espera(p.recurso_codigo) > 0:
+            try:
+                asignado = self.atender_siguiente_turno(p.recurso_codigo, p.sede)
+            except ValueError:
+                asignado = None
+            if asignado:
+                return asignado
+        return True
