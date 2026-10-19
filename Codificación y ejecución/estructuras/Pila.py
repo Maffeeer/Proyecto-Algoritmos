@@ -49,6 +49,13 @@ class Pila:
     def obtener_tamaño(self):
         return self.tope
 
+    # Mismos nombres que el resto de estructuras (camelCase)
+    def estaVacia(self):
+        return self.tope == 0
+
+    def obtenerTamaño(self):
+        return self.tope
+
     # Limpia la pila, eliminando todos los elementos
     def limpiar(self):
         self.tope = 0

@@ -1,3 +1,6 @@
+from estructuras.Algoritmos import mergeSort
+
+
 class Ordenamientos:
     @staticmethod
     def bubbleSort(arr, clave=lambda x: x):
@@ -39,27 +42,29 @@ class GeneradorInformes:
 
     def generarReporteUso(self):
         if not self.gestorPrestamos:
-            return "sin datos"
+            return "Sin datos"
         total = self.gestorPrestamos.obtenerCantidad()
-        return f"total de préstamos registrados: {total}"
+        return f"Total de préstamos registrados: {total}"
 
     def generarReporteInventario(self):
         if not self.gestorRecursos:
-            return "sin datos"
+            return "Sin datos"
         return str(self.gestorRecursos)
 
     # listados
 
+    # Entrega 2 (C8): merge sort, O(n log n) y estable. Antes era bubble sort, O(n²).
     def listarRecursosOrdenadosNombre(self, recursos):
-        return Ordenamientos.bubbleSort(recursos.copy(), lambda r: r.nombre)
+        return mergeSort(recursos, clave=lambda r: r.nombre)
 
     def listarRecursosOrdenadosPrestamos(self, recursos):
-        return Ordenamientos.bubbleSort(recursos.copy(), lambda r: -r.cantidadPrestamos)
+        # Estable: si dos recursos tienen la misma cantidad, conservan su orden por código
+        return mergeSort(recursos, clave=lambda r: r.cantidadPrestamos, reverso=True)
 
     def listarUsuariosOrdenadosNombre(self, usuarios):
-        return Ordenamientos.bubbleSort(usuarios.copy(), lambda u: u.nombre)
+        return mergeSort(usuarios, clave=lambda u: u.nombre)
 
     def obtenerOrdenamientos(self):
         return Ordenamientos
 
-    
+    

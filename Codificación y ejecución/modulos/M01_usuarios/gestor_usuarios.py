@@ -1,4 +1,4 @@
-from estructuras import VectorDinamico
+from estructuras import VectorDinamico, TablaHash
 from .usuario import Usuario
 
 class GestorUsuarios:
@@ -6,13 +6,14 @@ class GestorUsuarios:
         self.usuarios = VectorDinamico(capacidadInicial=10)
         self.contadorCodigos = 0
         self.codigosUsados = set()
+        self.indice = TablaHash(211)  # código -> Usuario, búsqueda O(1) promedio
 
     def registrar(self, nombre, email):
         #validar entrada
         if not nombre or (isinstance(nombre, str) and not nombre.strip()):
-            raise ValueError("El nombre no puede estar vacío.")
+            raise ValueError("El nombre del usuario no puede estar vacío")
         if not email or (isinstance(email, str) and not email.strip()):
-            raise ValueError("El email no puede estar vacío.")
+            raise ValueError("El email del usuario no puede estar vacío")
 
         #generar un código único para el usuario
         self.contadorCodigos += 1
@@ -24,16 +25,24 @@ class GestorUsuarios:
         #almacenar el usuario en el vector dinámico
         self.usuarios.agregar(usuario)
         self.codigosUsados.add(codigo)
+        self.indice.insertar(codigo, usuario)
 
         return codigo  # Devolver el código del usuario registrado
 
     def buscarUsuario(self, codigo):
-        #busqueda lineal en el vector dinámico
-        usuariosLista = self.usuarios.recorrer()
-        for usuario in usuariosLista:
+        # Entrega 2: búsqueda en la tabla hash, O(1) promedio
+        return self.indice.buscar(codigo)
+
+    def buscarxCodigo(self, codigo):
+        # Mismo nombre que en GestorRecursos (lo usan Préstamos y Turnos)
+        return self.buscarUsuario(codigo)
+
+    def buscarUsuarioLineal(self, codigo):
+        # Versión de la Entrega 1 (recorre el vector, O(n)); se deja para comparar
+        for usuario in self.usuarios.recorrer():
             if usuario.codigo == codigo:
                 return usuario
-        return None  # Devolver None si no se encuentra el usuario
+        return None
 
     def actualizar(self, codigo, nuevoEmail):
         usuario = self.buscarUsuario(codigo)
@@ -78,10 +87,11 @@ class GestorUsuarios:
         self.usuarios.limpiar()
         self.contadorCodigos = 0
         self.codigosUsados.clear()
+        self.indice = TablaHash(211)
 
     def __str__(self):
         activos = self.obtenerCantidadActivos()
         total = self.obtenerCantidad()
         return f"GestorUsuarios(total={total}, activos={activos})"
            
-    
+    

@@ -131,6 +131,6 @@ class GestorInventario:
             resultado += linea + "\n"
         return resultado
 
-    def __str__(self):
+    def _str__(self):
         return f"gestorInventario({self.numSedes} sedes x {self.contadorRecursos} recursos)" 
-    
+    

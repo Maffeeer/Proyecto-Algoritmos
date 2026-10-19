@@ -113,7 +113,7 @@ class TablaHash:
         self.cantidad = 0
 
     def __str__(self):
-        return f"TablaHash(cantidad={self.cantidad}, tamaño={self.tamaño}, factor_carga={self.obtener_factor_carga():.2f})"
+        return f"TablaHash(cantidad={self.cantidad}, tamaño={self.tamaño}, factor_carga={self.obtenerFactorCarga():.2f})"
 
     def __repr__(self):
         return self.__str__()

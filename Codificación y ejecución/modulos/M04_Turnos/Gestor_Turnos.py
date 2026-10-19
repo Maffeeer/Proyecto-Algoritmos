@@ -33,18 +33,18 @@ class GestorTurnos:
         if cola is None:
             return False
         for sol in cola.recorrer():
-            if sol.usuario_codigo == codigoUsuario:
+            if sol.codigoUsuario == codigoUsuario:
                 return True
         return False
 
     def solicitarTurno(self, codigoUsuario, codigoRecurso, sede):
         if self.gestorUsuarios:
-            usuario = self.gestorUsuarios.buscarUsuario(codigoUsuario)
+            usuario = self.gestorUsuarios.buscarxCodigo(codigoUsuario)
             if usuario is None:
                 raise ValueError(f"Usuario {codigoUsuario} no existe")
             if not usuario.esActivo():
                 raise ValueError(f"El usuario {codigoUsuario} esta inactivo")
-
+ 
         if self.gestorRecursos:
             recurso = self.gestorRecursos.buscarxCodigo(codigoRecurso)
             if recurso is None:
@@ -138,4 +138,4 @@ class GestorTurnos:
 
     
 
-    
+    

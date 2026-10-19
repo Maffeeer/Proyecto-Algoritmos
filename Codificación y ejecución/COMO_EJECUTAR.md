@@ -12,11 +12,18 @@ El menú principal permite acceder a:
 6. Categorías.
 7. Informes de uso e inventario.
 8. Demostración de estructuras de datos.
-9. Demostraciones de funciones inteligentes.
+9. Funciones inteligentes (usan los préstamos reales del sistema).
+10. Evidencia de eficiencia: mide en vivo Entrega 1 vs Entrega 2.
 
 Selecciona `0` para salir o volver desde los submenús.
 
 ## Ejecutar las pruebas
+
+```bash
+python main.py
+```
+
+Para las pruebas:
 
 ```bash
 python pruebas/test_basico.py

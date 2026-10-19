@@ -31,7 +31,10 @@ class TablaHash:
 
     FACTOR_MAX = 0.75
 
-    def __init__(self, capacidad=211):
+    def __init__(self, capacidad=211, tamaño=None):
+        # 'tamaño' se acepta para ser compatible con TablaHash(tamaño=100) de la Entrega 1
+        if tamaño is not None:
+            capacidad = tamaño
         self.capacidad = primoSiguiente(capacidad)
         self.cubetas = [None] * self.capacidad
         self.tamaño = 0
@@ -120,6 +123,19 @@ class TablaHash:
 
     def __contains__(self, clave):
         return self.contiene(clave)
+
+    # ---- mismos nombres que la TablaHash de la Entrega 1 (compatibilidad) ----
+    def obtenerCantidad(self):
+        return self.tamaño
+
+    def obtenerTamaño(self):
+        return self.capacidad
+
+    def obtenerTodasLasClaves(self):
+        return list(self.claves())
+
+    def obtenerFactorCarga(self):
+        return self.tamaño / self.capacidad
 
     # ---- análisis de colisiones (para el informe) ----
     def estadisticas(self):

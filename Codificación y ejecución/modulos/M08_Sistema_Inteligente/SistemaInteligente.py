@@ -33,6 +33,15 @@ class SistemaInteligente:
         if codigoUsuario in self.recomendacionesCache:
             del self.recomendacionesCache[codigoUsuario]  # Invalidar cache de recomendaciones para este usuario
 
+    # Quita el ultimo registro (usuario, recurso) del historial; lo usa "deshacer" de M03
+    def quitarPrestamoHist(self, codigoUsuario, codigoRecurso):
+        for i in range(self.historialPrestamos.obtenerTamaño() - 1, -1, -1):
+            user, recurso, _ = self.historialPrestamos.obtener(i)
+            if user == codigoUsuario and recurso == codigoRecurso:
+                self.historialPrestamos.eliminarxIndice(i)
+                return True
+        return False
+
     # Recomendaciones inteligentes basadas en usuarios similares
     def recomendarRecursos(self, codigoUsuario, top_n=5):
         # Si ya hay recomendaciones en cache, devolverlas
@@ -62,6 +71,8 @@ class SistemaInteligente:
             union = len(recursosUsuario | recursosOtro)
             similitud = interseccion / union if union > 0 else 0.0
 
+            if similitud == 0:
+                continue  # sin recursos en comun: no aporta a la recomendacion
             for recurso in recursosOtro:
                 if recurso not in recursosUsuario:
                     if recurso not in recursosSugeridos:
@@ -76,6 +87,19 @@ class SistemaInteligente:
     # Registra una calificación (1-5 estrellas) para un recurso por un usuario
     def registrarCalificacion(self, codigoUsuario, codigoRecurso, estrellas, comentario=""):
         """Registra una calificación (1-5 estrellas)."""
+        if not 1 <= estrellas <= 5:
+            raise ValueError("Estrellas deben estar entre 1 y 5")
+
+        self.calificaciones.agregar({
+            'usuario': codigoUsuario,
+            'recurso': codigoRecurso,
+            'estrellas': estrellas,
+            'comentario': comentario,
+            'fecha': datetime.now()
+        })
+
+    # Obtiene el promedio de calificaciones para un recurso específico
+    def registrarCalificacion(self, codigoUsuario, codigoRecurso, estrellas, comentario=""):
         if not 1 <= estrellas <= 5:
             raise ValueError("Estrellas deben estar entre 1 y 5")
 
