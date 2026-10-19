@@ -1,3 +1,5 @@
+#Mafe Morales
+
 #El sistema inteligente permite:
 #1. Recomendaciones inteligentes (Motor IA basico)
 #2. Calificaciones y reviews de los recursos

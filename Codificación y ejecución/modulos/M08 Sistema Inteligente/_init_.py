@@ -1,3 +1,3 @@
-from .sistemaInteligente import SistemaInteligente
+from .SistemaInteligente import SistemaInteligente
 
 __all__ = ["SistemaInteligente"]
