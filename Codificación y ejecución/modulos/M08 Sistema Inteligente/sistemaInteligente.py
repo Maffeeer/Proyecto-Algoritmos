@@ -130,3 +130,17 @@ class SistemaInteligente:
         ranking.sort(key=lambda x: (x[1], x[2]), reverse=True)
         return ranking[:top_n]
 
+    # Registra un préstamo finalizado para predicción de disponibilidad
+    def registrarPrestamoFinalizado(self, codigoRecurso, fechaInicio, fechaFin):
+        duracion = (fechaFin - fechaInicio).days
+        if duracion < 0:
+            duracion = 0
+
+        if codigoRecurso not in self.duracionesPromedio:
+            self.duracionesPromedio[codigoRecurso] = []
+        self.duracionesPromedio[codigoRecurso].append(duracion)
+
+        hora = fechaInicio.hour
+        self.demandaxHora[hora] = self.demandaxHora.get(hora, 0) + 1
+
+
