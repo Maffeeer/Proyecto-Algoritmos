@@ -11,12 +11,23 @@ class sistemaInteligente:
 
     def __init__(self):
 
+        # Historial de préstamos
         self.historialPrestamos = VectorDinamico()
         self.recomendacionesCache = {}  # Cache para recomendaciones
 
-        self.calificaciones = vectorDinamico()  # Vector para almacenar calificaciones y reviews
+        # Calificaciones y reviews
+        self.calificaciones = VectorDinamico()  # Vector para almacenar calificaciones y reviews
 
+        # Predicciones de disponibilidad
         self.duracionPromedio = {}
         self.demandaxHora = {}
 
+        # Gamificación
         self.usuariosGamificados = {}  # Diccionario para almacenar puntos y badges de usuarios
+
+    def registrarPrestamoHist(self, usuarioCodigo, recursoCodigo):
+        """Registra préstamo para análisis de recomendaciones."""
+        self.historialPrestamos.agregar((usuarioCodigo, recursoCodigo, datetime.now()))
+        if usuarioCodigo in self.recomendacionesCache:
+            del self.recomendacionesCache[usuarioCodigo]
+
