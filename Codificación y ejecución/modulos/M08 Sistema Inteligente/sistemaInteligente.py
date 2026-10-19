@@ -25,16 +25,19 @@ class SistemaInteligente:
         # Gamificación
         self.usuariosGamificados = {}  # Diccionario para almacenar puntos y badges de usuarios
 
-    def registrarPrestamoHist(self, usuarioCodigo, recursoCodigo):
-        self.historialPrestamos.agregar((usuarioCodigo, recursoCodigo, datetime.now()))
-        if usuarioCodigo in self.recomendacionesCache:
-            del self.recomendacionesCache[usuarioCodigo]
+    # Registra un préstamo en el historial y actualiza la cache de recomendaciones
+    def registrarPrestamoHist(self, codigoUsuario, codigoRecurso):
+        self.historialPrestamos.agregar((codigoUsuario, codigoRecurso, datetime.now()))
+        if codigoUsuario in self.recomendacionesCache:
+            del self.recomendacionesCache[codigoUsuario]  # Invalidar cache de recomendaciones para este usuario
 
-    def recomendarRecursos(self, usuarioCodigo, top_n=5):
+    # Recomendaciones inteligentes basadas en usuarios similares
+    def recomendarRecursos(self, codigoUsuario, top_n=5):
+        # Si ya hay recomendaciones en cache, devolverlas
         recursosUsuario = set()
         for i in range(self.historialPrestamos.obtenerTamaño()):
             user, recurso, _ = self.historialPrestamos.obtener(i)
-            if user == usuarioCodigo:
+            if user == codigoUsuario:
                 recursosUsuario.add(recurso)
 
         usuariosUnicos = set()
@@ -44,7 +47,7 @@ class SistemaInteligente:
 
         recursosSugeridos = {}
         for otroUsuario in usuariosUnicos:
-            if otroUsuario == usuarioCodigo:
+            if otroUsuario == codigoUsuario:
                 continue
 
             recursosOtro = set()
@@ -68,4 +71,29 @@ class SistemaInteligente:
         recomendaciones.sort(key=lambda x: x[1], reverse=True)
         return recomendaciones[:top_n]
 
+    # Registra una calificación (1-5 estrellas) para un recurso por un usuario
+    def registrarCalificacion(self, codigoUsuario, codigoRecurso, estrellas, comentario=""):
+        """Registra una calificación (1-5 estrellas)."""
+        if not 1 <= estrellas <= 5:
+            raise ValueError("Estrellas deben estar entre 1 y 5")
 
+        self.calificaciones.agregar({
+            'usuario': codigoUsuario,
+            'recurso': codigoRecurso,
+            'estrellas': estrellas,
+            'comentario': comentario,
+            'fecha': datetime.now()
+        })
+
+    def registrar_calificacion(self, usuario_codigo, recurso_codigo, estrellas, comentario=""):
+        """Registra una calificación (1-5 estrellas)."""
+        if not 1 <= estrellas <= 5:
+            raise ValueError("Estrellas deben estar entre 1 y 5")
+
+        self.calificaciones.agregar({
+            'usuario': usuario_codigo,
+            'recurso': recurso_codigo,
+            'estrellas': estrellas,
+            'comentario': comentario,
+            'fecha': datetime.now()
+        })

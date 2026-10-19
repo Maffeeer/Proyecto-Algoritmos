@@ -46,6 +46,7 @@ class GestorInventario:
 
         self.mapeoSedes[nombreSede] = indiceFila
 
+    # Obtiene la disponibilidad de un recurso en una sede específica
     def obtenerDisponibilidad(self, codigoRecurso, sede):
         if codigoRecurso not in self.mapeoRecursos or sede not in self.mapeoSedes:
             return 0
@@ -54,6 +55,7 @@ class GestorInventario:
         j = self.mapeoRecursos[codigoRecurso]
         return self.matriz[i][j]
 
+    # Incrementa o decrementa la disponibilidad de un recurso en una sede específica
     def decrementar(self, codigoRecurso, sede):
         if codigoRecurso not in self.mapeoRecursos or sede not in self.mapeoSedes:
             return False
@@ -66,6 +68,7 @@ class GestorInventario:
             return True
         return False
 
+    # Incrementa la disponibilidad de un recurso en una sede específica
     def incrementar(self, codigoRecurso, sede):
         if codigoRecurso not in self.mapeoRecursos or sede not in self.mapeoSedes:
             return False
@@ -76,6 +79,7 @@ class GestorInventario:
         self.matriz[i][j] += 1
         return True
 
+    # Actualiza la disponibilidad de un recurso en una sede específica
     def actualizar(self, codigoRecurso, sede, cantidad):
         if codigoRecurso not in self.mapeoRecursos or sede not in self.mapeoSedes:
             return False
@@ -86,6 +90,7 @@ class GestorInventario:
         self.matriz[i][j] = max(0, cantidad)
         return True
 
+    # Obtiene la disponibilidad total de un recurso en todas las sedes
     def obtenerFila(self, sede):
         if sede not in self.mapeoSedes:
             return []
@@ -93,6 +98,7 @@ class GestorInventario:
         i = self.mapeoSedes[sede]
         return self.matriz[i][:self.contadorRecursos]
 
+    # Obtiene la disponibilidad de un recurso específico en todas las sedes
     def obtenerColumna(self, codigoRecurso):
         if codigoRecurso not in self.mapeoRecursos:
             return []
@@ -100,6 +106,7 @@ class GestorInventario:
         j = self.mapeoRecursos[codigoRecurso]
         return [self.matriz[i][j] for i in range(self.numSedes)]
 
+    # Obtiene la disponibilidad total de todos los recursos en todas las sedes
     def mostrarMatriz(self):
         sedesOrdenadas = sorted(self.mapeoSedes.items(), key=lambda x: x[1])
         recursosOrdenados = sorted(self.mapeoRecursos.items(), key=lambda x: x[1])
