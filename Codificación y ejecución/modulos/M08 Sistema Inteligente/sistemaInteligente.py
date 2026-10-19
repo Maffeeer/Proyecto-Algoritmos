@@ -7,7 +7,7 @@
 from estructuras import VectorDinamico
 from datetime import datetime, timedelta
 
-class sistemaInteligente:
+class SistemaInteligente:
 
     def __init__(self):
 
@@ -26,8 +26,46 @@ class sistemaInteligente:
         self.usuariosGamificados = {}  # Diccionario para almacenar puntos y badges de usuarios
 
     def registrarPrestamoHist(self, usuarioCodigo, recursoCodigo):
-        """Registra préstamo para análisis de recomendaciones."""
         self.historialPrestamos.agregar((usuarioCodigo, recursoCodigo, datetime.now()))
         if usuarioCodigo in self.recomendacionesCache:
             del self.recomendacionesCache[usuarioCodigo]
+
+    def recomendarRecursos(self, usuarioCodigo, top_n=5):
+        recursosUsuario = set()
+        for i in range(self.historialPrestamos.obtenerTamaño()):
+            user, recurso, _ = self.historialPrestamos.obtener(i)
+            if user == usuarioCodigo:
+                recursosUsuario.add(recurso)
+
+        usuariosUnicos = set()
+        for i in range(self.historialPrestamos.obtenerTamaño()):
+            user, _, _ = self.historialPrestamos.obtener(i)
+            usuariosUnicos.add(user)
+
+        recursosSugeridos = {}
+        for otroUsuario in usuariosUnicos:
+            if otroUsuario == usuarioCodigo:
+                continue
+
+            recursosOtro = set()
+            for i in range(self.historialPrestamos.obtenerTamaño()):
+                user, recurso, _ = self.historialPrestamos.obtener(i)
+                if user == otroUsuario:
+                    recursosOtro.add(recurso)
+
+            interseccion = len(recursosUsuario & recursosOtro)
+            union = len(recursosUsuario | recursosOtro)
+            similitud = interseccion / union if union > 0 else 0.0
+
+            for recurso in recursosOtro:
+                if recurso not in recursosUsuario:
+                    if recurso not in recursosSugeridos:
+                        recursosSugeridos[recurso] = 0
+                    recursosSugeridos[recurso] += similitud
+
+        recomendaciones = [(r, s, "Usuarios similares lo pidieron")
+                          for r, s in recursosSugeridos.items()]
+        recomendaciones.sort(key=lambda x: x[1], reverse=True)
+        return recomendaciones[:top_n]
+
 

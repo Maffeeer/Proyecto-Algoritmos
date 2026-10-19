@@ -1,7 +1,7 @@
 #La clase gestorInventario gestiona la disponibilidad de los
 #recursos por sede, usando matriz [i][j]
 
-class gestorInventario:
+class GestorInventario:
 
     #Inicializador 
     def __init__(self, numSedes = 5, numRecursos = 50):

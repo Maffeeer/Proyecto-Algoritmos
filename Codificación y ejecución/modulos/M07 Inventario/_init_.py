@@ -1,2 +1,2 @@
-from .gestorInventario import gestorInventario
-_all_ = ["gestorInventario"]
+from .gestorInventario import GestorInventario
+_all_ = ["GestorInventario"]
