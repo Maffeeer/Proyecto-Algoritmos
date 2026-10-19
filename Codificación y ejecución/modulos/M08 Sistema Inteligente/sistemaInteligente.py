@@ -188,6 +188,17 @@ class SistemaInteligente:
                 usuario['nivel'] = nivel
                 break
 
+    # Gamificación: Registra un préstamo y otorga puntos y badges según la actividad
+    def registrarPrestamoGami(self, codigoUsuario):
+        if codigoUsuario not in self.usuariosGamificados:
+            self.crearUsuarioGamificado(codigoUsuario)
+
+        usuario = self.usuariosGamificados[codigoUsuario]
+        usuario['prestamos'] += 1
+        self.agregarPuntos(codigoUsuario, 10)
+
+        if usuario['prestamos'] >= 10:
+            usuario['badges'].add('LEAL')
 
 
 
