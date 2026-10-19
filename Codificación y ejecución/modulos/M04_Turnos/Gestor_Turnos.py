@@ -37,7 +37,31 @@ class GestorTurnos:
                 return True
         return False
 
-    
+    def solicitar_turno(self, usuario_codigo, recurso_codigo, sede):
+        if self.gestor_usuarios:
+            usuario = self.gestor_usuarios.buscar_por_codigo(usuario_codigo)
+            if usuario is None:
+                raise ValueError(f"Usuario {usuario_codigo} no existe")
+            if not usuario.es_activo():
+                raise ValueError(f"El usuario {usuario_codigo} esta inactivo")
+ 
+        if self.gestor_recursos:
+            recurso = self.gestor_recursos.buscar_por_codigo(recurso_codigo)
+            if recurso is None:
+                raise ValueError(f"Recurso {recurso_codigo} no existe")
+            if recurso.obtener_estado() == "Dado de baja":
+                raise ValueError(f"El recurso {recurso_codigo} esta dado de baja")
+            sede_existe = any(s.nombre == sede for s in self.gestor_recursos.listar_sedes())
+            if not sede_existe:
+                raise ValueError(f"Sede '{sede}' no existe")
+            if self.gestor_recursos.obtener_disponibilidad(recurso_codigo, sede) > 0:
+                raise ValueError("Hay unidades disponibles: registre el préstamo")
+ 
+        if self.esta_en_espera(usuario_codigo, recurso_codigo):
+            raise ValueError(f"El usuario {usuario_codigo} ya esta en la fila de {recurso_codigo}")
+ 
+        return self.encolar(usuario_codigo, recurso_codigo)
+
 
 
     
