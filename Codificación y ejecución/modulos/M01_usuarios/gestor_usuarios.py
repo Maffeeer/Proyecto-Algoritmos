@@ -4,8 +4,8 @@ from .usuario import Usuario
 class GestorUsuarios:
     def __init__(self):
         self.usuarios = VectorDinamico(capacidad_inicial=10)
-        self.contador_codigos = 0
-        self.codigos_usados = set()
+        self.contadorCodigos = 0
+        self.codigosUsados = set()
 
     def refistrar(self, nombre, email):
         #validar entrada
@@ -15,38 +15,38 @@ class GestorUsuarios:
             raise ValueError("El email no puede estar vacío.")
 
         #generar un código único para el usuario
-        self.contador_codigos += 1
-        codigo = f"U{self.contador_codigos:03d}"  # Formato: U0001, U0002, etc.
+        self.contadorCodigos += 1
+        codigo = f"U{self.contadorCodigos:03d}"  # Formato: U0001, U0002, etc.
 
         #crear un nuevo usuario
         usuario = Usuario(codigo, nombre, email)
 
         #almacenar el usuario en el vector dinámico
         self.usuarios.agregar(usuario)
-        self.codigos_usados.add(codigo)
+        self.codigosUsados.add(codigo)
 
         return codigo  # Devolver el código del usuario registrado
 
     def buscar_usuario(self, codigo):
         #busqueda lineal en el vector dinámico
-        usuarios_lista = self.usuarios.recorrer()
-        for usuario in usuarios_lista:
+        usuariosLista = self.usuarios.recorrer()
+        for usuario in usuariosLista:
             if usuario.codigo == codigo:
                 return usuario
         return None  # Devolver None si no se encuentra el usuario
 
-    def actualizar(self, codigo, nuevo_email):
+    def actualizar(self, codigo, nuevoEmail):
         usuario = self.buscar_usuario(codigo)
         if usuario:
-            usuario.email = nuevo_email
+            usuario.email = nuevoEmail
             return True  # Actualización exitosa
         return False  # Usuario no encontrado
 
     def dar_de_baja(self, codigo):
         usuario = self.buscar_usuario(codigo)
         if usuario:
-            if usuario.cantidad_prestamos > 0:
-                raise ValueError(f"No se puede dar de baja al usuario {codigo}: tiene {usuario.cantidad_prestamos} préstamos activos.")
+            if usuario.cantidadPrestamos > 0:
+                raise ValueError(f"No se puede dar de baja al usuario {codigo}: tiene {usuario.cantidadPrestamos} préstamos activos.")
             usuario.dar_de_baja()
             return True  # Baja exitosa
         return False  # Usuario no encontrado
@@ -66,7 +66,7 @@ class GestorUsuarios:
         return [u for u in todos if u.es_activo()]  # Devolver solo los usuarios activos
 
     def codigo_existe(self, codigo):
-        return codigo in self.codigos_usados  
+        return codigo in self.codigosUsados  
 
     def obtener_cantidad(self):
         return self.usuarios.obtener_tamaño()
@@ -76,8 +76,8 @@ class GestorUsuarios:
 
     def limpiar(self):
         self.usuarios.limpiar()
-        self.contador_codigos = 0
-        self.codigos_usados.clear()
+        self.contadorCodigos = 0
+        self.codigosUsados.clear()
 
     def __str__(self):
         activos = self.obtener_cantidad_activos()

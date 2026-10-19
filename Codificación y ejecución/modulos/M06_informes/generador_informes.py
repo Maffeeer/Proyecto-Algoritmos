@@ -1,12 +1,12 @@
 class Ordenamientos:
     @staticmethod
     def bubble_sort(arr, clave=lambda x: x):
-        arr_copia = arr.copy()
-        for i in range(len(arr_copia)):
-            for j in range(len(arr_copia)-1-i):
-                if clave(arr_copia[j]) > clave(arr_copia[j+1]):
-                    arr_copia[j], arr_copia[j+1] = arr_copia[j+1], arr_copia[j]
-        return arr_copia
+        arrCopia = arr.copy()
+        for i in range(len(arrCopia)):
+            for j in range(len(arrCopia)-1-i):
+                if clave(arrCopia[j]) > clave(arrCopia[j+1]):
+                    arrCopia[j], arrCopia[j+1] = arrCopia[j+1], arrCopia[j]
+        return arrCopia
 
     @staticmethod
     def quick_sort(arr, clave=lambda x: x, izq=0, der=None):
@@ -31,22 +31,22 @@ class Ordenamientos:
         return i + 1
 
 class GeneradorInformes:
-    def __init__(self, gestor_recursos=None, gestor_prestamos=None):
-        self.gestor_recursos = gestor_recursos
-        self.gestor_prestamos = gestor_prestamos
+    def __init__(self, gestorRecursos=None, gestorPrestamos=None):
+        self.gestorRecursos = gestorRecursos
+        self.gestorPrestamos = gestorPrestamos
 
     # ______Reportes______
 
     def generar_reporte_uso(self):
-        if not self.gestor_prestamos:
+        if not self.gestorPrestamos:
             return "sin datos"
-        total = self.gestor_prestamos.obtener_cantidad()
+        total = self.gestorPrestamos.obtener_cantidad()
         return f"total de préstamos registrados: {total}"
 
     def generar_reporte_inventario(self):
-        if not self.gestor_recursos:
+        if not self.gestorRecursos:
             return "sin datos"
-        return str(self.gestor_recursos)
+        return str(self.gestorRecursos)
 
     #______listados_______
 
@@ -54,7 +54,7 @@ class GeneradorInformes:
         return Ordenamientos.bubble_sort(recursos.copy(), lambda r: r.nombre)
 
     def listar_recursos_ordenados_prestamos(self, recursos):
-        return Ordenamientos.bubble_sort(recursos.copy(), lambda r: -r.cantidad_prestamos)
+        return Ordenamientos.bubble_sort(recursos.copy(), lambda r: -r.cantidadPrestamos)
 
     def listar_usuarios_ordenados_nombre(self, usuarios):
         return Ordenamientos.bubble_sort(usuarios.copy(), lambda u: u.nombre)
