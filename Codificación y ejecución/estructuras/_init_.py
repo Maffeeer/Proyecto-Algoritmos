@@ -1,4 +1,4 @@
-from .VectoDinamico import VectorDinamico
+from .VectorDinamico import VectorDinamico
 from .ListaSimple import ListaSimple, NodoSimple
 from .ListaDoble import ListaDoble, NodoDoble
 from .Pila import Pila
