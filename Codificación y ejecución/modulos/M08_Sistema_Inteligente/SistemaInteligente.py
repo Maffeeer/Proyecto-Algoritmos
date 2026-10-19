@@ -21,7 +21,7 @@ class SistemaInteligente:
         self.calificaciones = VectorDinamico()  # Vector para almacenar calificaciones y reviews
 
         # Predicciones de disponibilidad
-        self.duracionPromedio = {}
+        self.duracionesPromedio = {}
         self.demandaxHora = {}
 
         # Gamificación
@@ -76,19 +76,6 @@ class SistemaInteligente:
     # Registra una calificación (1-5 estrellas) para un recurso por un usuario
     def registrarCalificacion(self, codigoUsuario, codigoRecurso, estrellas, comentario=""):
         """Registra una calificación (1-5 estrellas)."""
-        if not 1 <= estrellas <= 5:
-            raise ValueError("Estrellas deben estar entre 1 y 5")
-
-        self.calificaciones.agregar({
-            'usuario': codigoUsuario,
-            'recurso': codigoRecurso,
-            'estrellas': estrellas,
-            'comentario': comentario,
-            'fecha': datetime.now()
-        })
-
-    # Obtiene el promedio de calificaciones para un recurso específico
-    def registrarCalificacion(self, codigoUsuario, codigoRecurso, estrellas, comentario=""):
         if not 1 <= estrellas <= 5:
             raise ValueError("Estrellas deben estar entre 1 y 5")
 
@@ -175,7 +162,7 @@ class SistemaInteligente:
         }
 
     # Gamificación: Agrega puntos a un usuario y actualiza su nivel
-    def agregar_puntos(self, codigoUsuario, cantidad):
+    def agregarPuntos(self, codigoUsuario, cantidad):
         """Agrega puntos a usuario y actualiza nivel."""
         if codigoUsuario not in self.usuariosGamificados:
             self.crearUsuarioGamificado(codigoUsuario)
@@ -209,7 +196,7 @@ class SistemaInteligente:
 
         usuario = self.usuariosGamificados[codigoUsuario]
         usuario['devolucionesTiempo'] += 1
-        self.agregar_puntos(codigoUsuario, 20)
+        self.agregarPuntos(codigoUsuario, 20)
 
         if usuario['devolucionesTiempo'] >= 5:
             usuario['badges'].add('DEVOLVEDOR')

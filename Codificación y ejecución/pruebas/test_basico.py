@@ -24,7 +24,7 @@ sys.path.insert(0, RAIZ)
 from estructuras import VectorDinamico, TablaHash
 from modulos import (GestorUsuarios, GestorRecursos, GestorPrestamos, GestorTurnos,
                      GestorCategorias, GeneradorInformes)
-from modulos.M03_prestamos import SinUnidadesError
+from modulos.M03_Prestamos import SinUnidadesError
 
 
 # UTILIDADES
@@ -55,26 +55,26 @@ def sistema(unidades=5):
     y R0001 con `unidades` ejemplares en Centro.
     """
     gu = GestorUsuarios()
-    gr = GestorRecursos(num_sedes=3)
+    gr = GestorRecursos(numSedes=3)
     for i, nombre in enumerate(("Centro", "Norte", "Sur")):
-        gr.registrar_sede(i, nombre)
-    gt = GestorTurnos(gestor_usuarios=gu, gestor_recursos=gr)
-    gp = GestorPrestamos(gestor_turnos=gt, gestor_usuarios=gu, gestor_recursos=gr)
+        gr.registrarSede(i, nombre)
+    gt = GestorTurnos(gestorUsuarios=gu, gestorRecursos=gr)
+    gp = GestorPrestamos(gestorTurnos=gt, gestorUsuarios=gu, gestorRecursos=gr)
     for nombre in ("Carlos", "Ana", "Luis"):
         gu.registrar(nombre, nombre.lower() + "@uni.edu")
-    r = gr.registrar_libro("Python 101", "Guido", "978-123", 2020)
-    gr.actualizar_disponibilidad(r, "Centro", unidades)
+    r = gr.registrarLibro("Python 101", "Guido", "978-123", 2020)
+    gr.actualizarDisponibilidad(r, "Centro", unidades)
     return gu, gr, gt, gp
 
 
 def disp(gr, recurso="R0001", sede="Centro"):
     """Unidades disponibles en la matriz de inventario."""
-    return gr.obtener_disponibilidad(recurso, sede)
+    return gr.obtenerDisponibilidad(recurso, sede)
 
 
 def fila(gt, recurso="R0001"):
     """Usuarios en la fila de espera, en orden."""
-    return [s.usuario_codigo for s in gt.obtener_fila(recurso)]
+    return [s.usuario_codigo for s in gt.obtenerFila(recurso)]
 
 
 def ejecutar_menu(entrada):
@@ -94,27 +94,27 @@ def menu_ok(salida, codigo):
 
 # PRUEBAS
 
-def test_e1_listar_activos():
-    """E1: GestorPrestamos.listar_activos()."""
+def test_e1_listarActivos():
+    """E1: GestorPrestamos.listarActivos()."""
     print("\nE1: Listar préstamos activos")
     print("-" * 50)
     gu, gr, gt, gp = sistema(5)
 
-    caso("límite", "sin préstamos", "listar_activos().obtener_tamaño()", 0,
-         gp.listar_activos().obtener_tamaño())
+    caso("límite", "sin préstamos", "listarActivos().obtenerTamaño()", 0,
+         gp.listarActivos().obtenerTamaño())
 
-    gp.registrar_prestamo("U001", "R0001", "Centro")
-    gp.registrar_prestamo("U002", "R0001", "Centro")
-    activos = gp.listar_activos()
-    caso("normal", "P0001 y P0002 activos", "listar_activos() devuelve VectorDinamico",
+    gp.registrarPrestamo("U001", "R0001", "Centro")
+    gp.registrarPrestamo("U002", "R0001", "Centro")
+    activos = gp.listarActivos()
+    caso("normal", "P0001 y P0002 activos", "listarActivos() devuelve VectorDinamico",
          True, isinstance(activos, VectorDinamico))
-    caso("normal", "P0001 y P0002 activos", "códigos en listar_activos()",
-         "P0001,P0002", ",".join(activos.obtener(i).codigo for i in range(activos.obtener_tamaño())))
+    caso("normal", "P0001 y P0002 activos", "códigos en listarActivos()",
+         "P0001,P0002", ",".join(activos.obtener(i).codigo for i in range(activos.obtenerTamaño())))
 
-    gp.registrar_devolucion("P0001")
-    activos = gp.listar_activos()
-    caso("normal", "P0001 devuelto, P0002 activo", "listar_activos() solo trae 'Activo'",
-         "P0002", ",".join(activos.obtener(i).codigo for i in range(activos.obtener_tamaño())))
+    gp.registrarDevolucion("P0001")
+    activos = gp.listarActivos()
+    caso("normal", "P0001 devuelto, P0002 activo", "listarActivos() solo trae 'Activo'",
+         "P0002", ",".join(activos.obtener(i).codigo for i in range(activos.obtenerTamaño())))
 
     salida, codigo = ejecutar_menu("4\n1\nU001\nR0001\nCentro\n\n3\n\n0\n0\n")
     caso("menú", "Préstamos -> 1 (U001, R0001, Centro) -> 3", "salida de main.py",
@@ -177,17 +177,17 @@ def test_e3_disponibilidad_por_sede():
     print("-" * 50)
     gu, gr, gt, gp = sistema(5)
 
-    codigos = ",".join(gp.registrar_prestamo(u, "R0001", "Centro")
+    codigos = ",".join(gp.registrarPrestamo(u, "R0001", "Centro")
                        for u in ("U001", "U002", "U003", "U001", "U002"))
     caso("normal", "R0001 con 5 en Centro", "prestar 5 veces", "P0001,P0002,P0003,P0004,P0005", codigos)
     caso("límite", "se prestó la última unidad", "disponibilidad R0001/Centro", 0, disp(gr))
     caso("error", "R0001 con 0 en Centro", "sexto préstamo",
          "SinUnidadesError: Sin unidades disponibles de R0001 en Centro",
-         error_de(gp.registrar_prestamo, "U003", "R0001", "Centro"))
+         error_de(gp.registrarPrestamo, "U003", "R0001", "Centro"))
     caso("error", "SinUnidadesError", "¿es un ValueError?", True, issubclass(SinUnidadesError, ValueError))
     caso("error", "R0001 con 0 en Norte", "prestar en Norte",
          "SinUnidadesError: Sin unidades disponibles de R0001 en Norte",
-         error_de(gp.registrar_prestamo, "U001", "R0001", "Norte"))
+         error_de(gp.registrarPrestamo, "U001", "R0001", "Norte"))
     caso("normal", "GestorPrestamos", "¿todavía tiene el atributo 'exclusivo'?",
          False, hasattr(gp, "exclusivo"))
 
@@ -216,33 +216,33 @@ def test_e4_inventario():
     print("-" * 50)
     gu, gr, gt, gp = sistema(5)
 
-    gp.registrar_prestamo("U001", "R0001", "Centro")
+    gp.registrarPrestamo("U001", "R0001", "Centro")
     caso("normal", "R0001 con 5 en Centro", "prestar 1", 4, disp(gr))
     for u in ("U002", "U003", "U001", "U002"):
-        gp.registrar_prestamo(u, "R0001", "Centro")
+        gp.registrarPrestamo(u, "R0001", "Centro")
     caso("límite", "4 préstamos más", "disponibilidad", 0, disp(gr))
 
-    gp.registrar_devolucion("P0001")
+    gp.registrarDevolucion("P0001")
     caso("normal", "disponibilidad 0", "devolver P0001", 1, disp(gr))
     gp.deshacer()
     caso("normal", "disponibilidad 1 tras devolver", "deshacer esa devolución", 0, disp(gr))
-    caso("normal", "deshacer devolución", "estado de P0001", "Activo", gp.buscar_prestamo("P0001").estado)
+    caso("normal", "deshacer devolución", "estado de P0001", "Activo", gp.buscarPrestamo("P0001").estado)
     gp.deshacer()
     caso("normal", "disponibilidad 0", "deshacer el préstamo P0005", 1, disp(gr))
-    caso("normal", "deshacer préstamo", "¿P0005 sigue existiendo?", None, gp.buscar_prestamo("P0005"))
+    caso("normal", "deshacer préstamo", "¿P0005 sigue existiendo?", None, gp.buscarPrestamo("P0005"))
     caso("normal", "Norte no participó", "disponibilidad R0001/Norte", 0, disp(gr, sede="Norte"))
 
     # Caso límite: el inventario se cambió a mano y ya no hay unidad para revertir la devolución
-    gp.registrar_devolucion("P0004")
+    gp.registrarDevolucion("P0004")
     gr.actualizar_disponibilidad("R0001", "Centro", 0)
     caso("límite", "devolución de P0004 y luego inventario puesto en 0 a mano", "deshacer",
          "ValueError: No se puede deshacer la devolucion de P0004: no quedan unidades de R0001 en Centro",
          error_de(gp.deshacer))
-    tope = gp.pila_deshacer.peek()
+    tope = gp.pilaDeshacer.peek()
     caso("límite", "deshacer rechazado", "tope de la pila (la operación no se perdió)",
-         "registrar_devolucion P0004", f"{tope['operacion']} {tope['prestamo'].codigo}")
+         "registrarDevolucion P0004", f"{tope['operacion']} {tope['prestamo'].codigo}")
     caso("límite", "deshacer rechazado", "estado de P0004 (sin cambios)", "Devuelto",
-         gp.buscar_prestamo("P0004").estado)
+         gp.buscarPrestamo("P0004").estado)
 
     print("E4: CORRECTO")
     return True
@@ -253,12 +253,12 @@ def test_e5_devolucion_inexistente():
     print("\nE5: Devolución inexistente")
     print("-" * 50)
     gu, gr, gt, gp = sistema(5)
-    gp.registrar_prestamo("U001", "R0001", "Centro")
+    gp.registrarPrestamo("U001", "R0001", "Centro")
 
-    caso("error", "P9999 no existe", "registrar_devolucion('P9999')", False, gp.registrar_devolucion("P9999"))
-    caso("normal", "P0001 activo", "registrar_devolucion('P0001')", True, gp.registrar_devolucion("P0001"))
-    caso("límite", "P0001 ya devuelto", "registrar_devolucion('P0001') otra vez", False,
-         gp.registrar_devolucion("P0001"))
+    caso("error", "P9999 no existe", "registrarDevolucion('P9999')", False, gp.registrarDevolucion("P9999"))
+    caso("normal", "P0001 activo", "registrarDevolucion('P0001')", True, gp.registrarDevolucion("P0001"))
+    caso("límite", "P0001 ya devuelto", "registrarDevolucion('P0001') otra vez", False,
+         gp.registrarDevolucion("P0001"))
     caso("límite", "segunda devolución rechazada", "disponibilidad (no suma dos veces)", 5, disp(gr))
 
     salida, codigo = ejecutar_menu("4\n2\nP9999\n\n0\n0\n")
@@ -272,36 +272,36 @@ def test_e5_devolucion_inexistente():
     return True
 
 
-def test_e6a_solicitar_turno():
-    """E6a: GestorTurnos.solicitar_turno valida antes de encolar."""
+def test_e6a_solicitarTurno():
+    """E6a: GestorTurnos.solicitarTurno valida antes de encolar."""
     print("\nE6a: Solicitar turno")
     print("-" * 50)
     gu, gr, gt, gp = sistema(1)
 
-    caso("error", "R0001 con 1 en Centro", "solicitar_turno(U002, R0001, Centro)",
+    caso("error", "R0001 con 1 en Centro", "solicitarTurno(U002, R0001, Centro)",
          "ValueError: Hay unidades disponibles: registre el préstamo",
-         error_de(gt.solicitar_turno, "U002", "R0001", "Centro"))
+         error_de(gt.solicitarTurno, "U002", "R0001", "Centro"))
 
-    gp.registrar_prestamo("U001", "R0001", "Centro")
-    caso("normal", "R0001 con 0 en Centro", "solicitar_turno(U002, R0001, Centro)",
-         "S0001", gt.solicitar_turno("U002", "R0001", "Centro"))
-    caso("normal", "R0001 con 0 en Centro", "solicitar_turno(U003, R0001, Centro)",
-         "S0002", gt.solicitar_turno("U003", "R0001", "Centro"))
-    caso("normal", "dos turnos", "posición de U003 = obtener_cantidad_espera", 2,
-         gt.obtener_cantidad_espera("R0001"))
-    caso("error", "U002 ya está en la fila", "solicitar_turno(U002, R0001, Centro)",
+    gp.registrarPrestamo("U001", "R0001", "Centro")
+    caso("normal", "R0001 con 0 en Centro", "solicitarTurno(U002, R0001, Centro)",
+         "S0001", gt.solicitarTurno("U002", "R0001", "Centro"))
+    caso("normal", "R0001 con 0 en Centro", "solicitarTurno(U003, R0001, Centro)",
+         "S0002", gt.solicitarTurno("U003", "R0001", "Centro"))
+    caso("normal", "dos turnos", "posición de U003 = obtenerCantidadEspera", 2,
+         gt.obtenerCantidadEspera("R0001"))
+    caso("error", "U002 ya está en la fila", "solicitarTurno(U002, R0001, Centro)",
          "ValueError: El usuario U002 ya esta en la fila de R0001",
-         error_de(gt.solicitar_turno, "U002", "R0001", "Centro"))
-    caso("error", "U999 no existe", "solicitar_turno(U999, R0001, Centro)",
-         "ValueError: Usuario U999 no existe", error_de(gt.solicitar_turno, "U999", "R0001", "Centro"))
-    caso("error", "R0099 no existe", "solicitar_turno(U001, R0099, Centro)",
-         "ValueError: Recurso R0099 no existe", error_de(gt.solicitar_turno, "U001", "R0099", "Centro"))
-    caso("error", "sede 'Marte' no existe", "solicitar_turno(U001, R0001, Marte)",
-         "ValueError: Sede 'Marte' no existe", error_de(gt.solicitar_turno, "U001", "R0001", "Marte"))
+         error_de(gt.solicitarTurno, "U002", "R0001", "Centro"))
+    caso("error", "U999 no existe", "solicitarTurno(U999, R0001, Centro)",
+         "ValueError: Usuario U999 no existe", error_de(gt.solicitarTurno, "U999", "R0001", "Centro"))
+    caso("error", "R0099 no existe", "solicitarTurno(U001, R0099, Centro)",
+         "ValueError: Recurso R0099 no existe", error_de(gt.solicitarTurno, "U001", "R0099", "Centro"))
+    caso("error", "sede 'Marte' no existe", "solicitarTurno(U001, R0001, Marte)",
+         "ValueError: Sede 'Marte' no existe", error_de(gt.solicitarTurno, "U001", "R0001", "Marte"))
     u4 = gu.registrar("Inactivo", "in@uni.edu")
-    gu.dar_de_baja(u4)
-    caso("error", f"{u4} dado de baja", f"solicitar_turno({u4}, R0001, Centro)",
-         f"ValueError: El usuario {u4} esta inactivo", error_de(gt.solicitar_turno, u4, "R0001", "Centro"))
+    gu.darDeBaja(u4)
+    caso("error", f"{u4} dado de baja", f"solicitarTurno({u4}, R0001, Centro)",
+         f"ValueError: El usuario {u4} esta inactivo", error_de(gt.solicitarTurno, u4, "R0001", "Centro"))
     caso("error", "solicitudes rechazadas", "la fila no cambió", ["U002", "U003"], fila(gt))
 
     # Menú: R0003 tiene 1 unidad; U001 la presta y U002 pide turno desde Turnos -> 4
@@ -318,23 +318,23 @@ def test_e6a_solicitar_turno():
     return True
 
 
-def test_e6b_ver_siguiente():
-    """E6b: ver_siguiente consulta sin desencolar."""
+def test_e6b_verSiguiente():
+    """E6b: verSiguiente consulta sin desencolar."""
     print("\nE6b: Ver siguiente turno sin sacarlo")
     print("-" * 50)
     gu, gr, gt, gp = sistema(0)
 
-    caso("límite", "fila vacía", "ver_siguiente(R0001)", None, gt.ver_siguiente("R0001"))
-    gt.solicitar_turno("U002", "R0001", "Centro")
-    caso("límite", "un solo elemento [U002]", "ver_siguiente(R0001).usuario_codigo", "U002",
-         gt.ver_siguiente("R0001").usuario_codigo)
-    gt.solicitar_turno("U003", "R0001", "Centro")
-    gt.ver_siguiente("R0001")
-    gt.ver_siguiente("R0001")
-    caso("normal", "fila [U002, U003]", "ver_siguiente dos veces -> tamaño de la fila", 2,
-         gt.obtener_cantidad_espera("R0001"))
+    caso("límite", "fila vacía", "verSiguiente(R0001)", None, gt.verSiguiente("R0001"))
+    gt.solicitarTurno("U002", "R0001", "Centro")
+    caso("límite", "un solo elemento [U002]", "verSiguiente(R0001).usuario_codigo", "U002",
+         gt.verSiguiente("R0001").usuario_codigo)
+    gt.solicitarTurno("U003", "R0001", "Centro")
+    gt.verSiguiente("R0001")
+    gt.verSiguiente("R0001")
+    caso("normal", "fila [U002, U003]", "verSiguiente dos veces -> tamaño de la fila", 2,
+         gt.obtenerCantidadEspera("R0001"))
     caso("normal", "fila [U002, U003]", "estado de S0001 tras consultar", "En espera",
-         gt.buscar_solicitud("S0001").estado)
+         gt.buscarSolicitud("S0001").estado)
 
     # Menú: dejar a U002 en fila de R0003 y consultar "Ver siguiente" dos veces
     salida, codigo = ejecutar_menu("4\n1\nU001\nR0003\nCentro\n\n0\n5\n4\nU002\nR0003\nCentro\n\n"
@@ -355,39 +355,39 @@ def test_e6c_atender_al_devolver():
     print("-" * 50)
     gu, gr, gt, gp = sistema(1)
 
-    gp.registrar_prestamo("U001", "R0001", "Centro")
-    caso("límite", "R0001 sin fila", "registrar_devolucion('P0001')", True, gp.registrar_devolucion("P0001"))
+    gp.registrarPrestamo("U001", "R0001", "Centro")
+    caso("límite", "R0001 sin fila", "registrarDevolucion('P0001')", True, gp.registrarDevolucion("P0001"))
 
-    gp.registrar_prestamo("U001", "R0001", "Centro")  # P0002, queda 0
-    gt.solicitar_turno("U002", "R0001", "Centro")
-    gt.solicitar_turno("U003", "R0001", "Centro")
-    resultado = gp.registrar_devolucion("P0002")
-    caso("normal", "fila [U002, U003]", "registrar_devolucion('P0002') devuelve", "P0003", resultado)
+    gp.registrarPrestamo("U001", "R0001", "Centro")  # P0002, queda 0
+    gt.solicitarTurno("U002", "R0001", "Centro")
+    gt.solicitarTurno("U003", "R0001", "Centro")
+    resultado = gp.registrarDevolucion("P0002")
+    caso("normal", "fila [U002, U003]", "registrarDevolucion('P0002') devuelve", "P0003", resultado)
     caso("normal", "asignación automática", "usuario del préstamo P0003", "U002",
-         gp.buscar_prestamo("P0003").usuario_codigo)
+         gp.buscarPrestamo("P0003").usuario_codigo)
     caso("normal", "asignación automática", "fila después", ["U003"], fila(gt))
     caso("normal", "asignación automática", "disponibilidad (devuelta y vuelta a prestar)", 0, disp(gr))
-    caso("normal", "asignación automática", "estado de S0001", "Otorgado", gt.buscar_solicitud("S0001").estado)
+    caso("normal", "asignación automática", "estado de S0001", "Otorgado", gt.buscarSolicitud("S0001").estado)
 
     # Usuario de la fila que ya no está activo: se salta
     gu2, gr2, gt2, gp2 = sistema(1)
-    gp2.registrar_prestamo("U001", "R0001", "Centro")
-    gt2.solicitar_turno("U002", "R0001", "Centro")
-    gt2.solicitar_turno("U003", "R0001", "Centro")
-    gu2.dar_de_baja("U002")
-    resultado = gp2.registrar_devolucion("P0001")
+    gp2.registrarPrestamo("U001", "R0001", "Centro")
+    gt2.solicitarTurno("U002", "R0001", "Centro")
+    gt2.solicitarTurno("U003", "R0001", "Centro")
+    gu2.darDeBaja("U002")
+    resultado = gp2.registrarDevolucion("P0001")
     caso("normal", "fila [U002 (inactivo), U003]", "devolver P0001 -> usuario asignado",
-         "U003", gp2.buscar_prestamo(resultado).usuario_codigo)
+         "U003", gp2.buscarPrestamo(resultado).usuario_codigo)
     caso("normal", "U002 inactivo saltado", "estado de su solicitud S0001", "Cancelado",
-         gt2.buscar_solicitud("S0001").estado)
+         gt2.buscarSolicitud("S0001").estado)
 
     # Fila solo con usuarios inactivos: la unidad queda libre
     gu3, gr3, gt3, gp3 = sistema(1)
-    gp3.registrar_prestamo("U001", "R0001", "Centro")
-    gt3.solicitar_turno("U002", "R0001", "Centro")
-    gu3.dar_de_baja("U002")
-    caso("límite", "fila [U002 (inactivo)]", "registrar_devolucion('P0001')", True,
-         gp3.registrar_devolucion("P0001"))
+    gp3.registrarPrestamo("U001", "R0001", "Centro")
+    gt3.solicitarTurno("U002", "R0001", "Centro")
+    gu3.darDeBaja("U002")
+    caso("límite", "fila [U002 (inactivo)]", "registrarDevolucion('P0001')", True,
+         gp3.registrarDevolucion("P0001"))
     caso("límite", "nadie activo en la fila", "disponibilidad", 1, disp(gr3))
     caso("límite", "nadie activo en la fila", "fila después", [], fila(gt3))
 
@@ -410,14 +410,14 @@ def test_e7_categoria_repetida():
     print("-" * 50)
     gc = GestorCategorias()
 
-    caso("normal", "C1 'Ingenieria'", "registrar_categoria", "C1", gc.registrar_categoria("C1", "Ingenieria"))
-    caso("error", "C1 ya existe", "registrar_categoria('C1', 'Repetida')",
-         "ValueError: La categoria C1 ya existe", error_de(gc.registrar_categoria, "C1", "Repetida"))
-    caso("error", "C1 rechazada", "nombre de C1", "Ingenieria", gc.obtener_categoria("C1").nombre)
+    caso("normal", "C1 'Ingenieria'", "registrarCategoria", "C1", gc.registrarCategoria("C1", "Ingenieria"))
+    caso("error", "C1 ya existe", "registrarCategoria('C1', 'Repetida')",
+         "ValueError: La categoria C1 ya existe", error_de(gc.registrarCategoria, "C1", "Repetida"))
+    caso("error", "C1 rechazada", "nombre de C1", "Ingenieria", gc.obtenerCategoria("C1").nombre)
     caso("error", "C1 rechazada", "obtener_cantidad()", 1, gc.obtener_cantidad())
     caso("normal", "GestorCategorias", "estructura de 'categorias'", "TablaHash",
          type(gc.categorias).__name__)
-    caso("límite", "C9 no existe", "obtener_categoria('C9')", None, gc.obtener_categoria("C9"))
+    caso("límite", "C9 no existe", "obtenerCategoria('C9')", None, gc.obtenerCategoria("C9"))
 
     salida, codigo = ejecutar_menu("6\n1\nC1\nIngenieria\n\n1\nC1\nRepetida\n\n2\nC1\n\n0\n0\n")
     caso("menú", "Categorías -> C1 dos veces y buscar C1", "salida de main.py",
@@ -435,17 +435,17 @@ def test_e8_informes():
     print("\nE8: Informes")
     print("-" * 50)
     gu, gr, gt, gp = sistema(5)
-    gr.registrar_equipo("Proyector", "Proyector", "Epson", "Sala A")
-    gr.registrar_sala("Sala", 30)
-    gp.registrar_prestamo("U001", "R0001", "Centro")
+    gr.registrarEquipo("Proyector", "Proyector", "Epson", "Sala A")
+    gr.registrarSala("Sala", 30)
+    gp.registrarPrestamo("U001", "R0001", "Centro")
     gi = GeneradorInformes(gestor_recursos=gr, gestor_prestamos=gp)
 
-    caso("normal", "3 recursos y 1 préstamo", "generar_reporte_uso()",
-         "Total de préstamos registrados: 1", gi.generar_reporte_uso())
-    caso("normal", "3 recursos y 1 préstamo", "generar_reporte_inventario()",
-         "GestorRecursos(libros=1, equipos=1, salas=1)", gi.generar_reporte_inventario())
-    caso("límite", "sin gestores", "GeneradorInformes().generar_reporte_uso()", "Sin datos",
-         GeneradorInformes().generar_reporte_uso())
+    caso("normal", "3 recursos y 1 préstamo", "generarReporteUso()",
+         "Total de préstamos registrados: 1", gi.generarReporteUso())
+    caso("normal", "3 recursos y 1 préstamo", "generarReporteInventario()",
+         "GestorRecursos(libros=1, equipos=1, salas=1)", gi.generarReporteInventario())
+    caso("límite", "sin gestores", "GeneradorInformes().generarReporteUso()", "Sin datos",
+         GeneradorInformes().generarReporteUso())
 
     salida, codigo = ejecutar_menu("4\n1\nU001\nR0001\nCentro\n\n0\n7\n1\n\n2\n\n0\n0\n")
     caso("menú", "1 préstamo y luego Informes -> 1 y 2", "salida de main.py",
@@ -465,20 +465,20 @@ def test_e9_usuario_inactivo_recurso_baja():
     print("-" * 50)
     gu, gr, gt, gp = sistema(5)
 
-    gu.dar_de_baja("U001")
-    caso("error", "U001 inactivo", "registrar_prestamo(U001, R0001, Centro)",
+    gu.darDeBaja("U001")
+    caso("error", "U001 inactivo", "registrarPrestamo(U001, R0001, Centro)",
          "ValueError: El usuario U001 esta inactivo",
-         error_de(gp.registrar_prestamo, "U001", "R0001", "Centro"))
+         error_de(gp.registrarPrestamo, "U001", "R0001", "Centro"))
     caso("error", "préstamo rechazado", "disponibilidad (no se descontó)", 5, disp(gr))
-    caso("normal", "U002 activo", "registrar_prestamo(U002, R0001, Centro)", "P0001",
-         gp.registrar_prestamo("U002", "R0001", "Centro"))
+    caso("normal", "U002 activo", "registrarPrestamo(U002, R0001, Centro)", "P0001",
+         gp.registrarPrestamo("U002", "R0001", "Centro"))
 
     r2 = gr.registrar_libro("Viejo", "a", "i", 1990)
     gr.actualizar_disponibilidad(r2, "Centro", 2)
-    gr.dar_de_baja(r2)
-    caso("error", f"{r2} dado de baja", f"registrar_prestamo(U002, {r2}, Centro)",
+    gr.darDeBaja(r2)
+    caso("error", f"{r2} dado de baja", f"registrarPrestamo(U002, {r2}, Centro)",
          f"ValueError: El recurso {r2} esta dado de baja",
-         error_de(gp.registrar_prestamo, "U002", r2, "Centro"))
+         error_de(gp.registrarPrestamo, "U002", r2, "Centro"))
     caso("error", "préstamo rechazado", f"disponibilidad de {r2}", 2, disp(gr, r2))
 
     print("E9: CORRECTO")
@@ -509,7 +509,7 @@ def test_e10_inventario_500():
     gu = GestorUsuarios()
     gu.registrar("Ana", "a@u")
     gp = GestorPrestamos(gestor_usuarios=gu, gestor_recursos=gr)
-    gp.registrar_prestamo("U001", "R0101", "Centro")
+    gp.registrarPrestamo("U001", "R0101", "Centro")
     caso("normal", "R0101 con 3", "prestar R0101 -> disponibilidad", 2, disp(gr, "R0101"))
 
     print("E10: CORRECTO")
@@ -522,40 +522,40 @@ def test_e11_deshacer_turno():
     print("-" * 50)
     gu, gr, gt, gp = sistema(1)
 
-    gp.registrar_prestamo("U001", "R0001", "Centro")  # P0001, queda 0
-    gt.solicitar_turno("U002", "R0001", "Centro")
-    gt.solicitar_turno("U003", "R0001", "Centro")
-    gp.registrar_devolucion("P0001")  # asigna P0002 a U002
+    gp.registrarPrestamo("U001", "R0001", "Centro")  # P0001, queda 0
+    gt.solicitarTurno("U002", "R0001", "Centro")
+    gt.solicitarTurno("U003", "R0001", "Centro")
+    gp.registrarDevolucion("P0001")  # asigna P0002 a U002
     caso("normal", "devolución con fila [U002, U003]", "operaciones en la pila (préstamo, devolución, automático)",
-         3, gp.pila_deshacer.obtener_tamaño())
+         3, gp.pilaDeshacer.obtenerTamaño())
 
     gp.deshacer()
     caso("normal", "deshacer el préstamo automático P0002", "fila", ["U002", "U003"], fila(gt))
     caso("normal", "deshacer el préstamo automático P0002", "estado de S0001", "En espera",
-         gt.buscar_solicitud("S0001").estado)
-    caso("normal", "deshacer el préstamo automático P0002", "¿P0002 existe?", None, gp.buscar_prestamo("P0002"))
+         gt.buscarSolicitud("S0001").estado)
+    caso("normal", "deshacer el préstamo automático P0002", "¿P0002 existe?", None, gp.buscarPrestamo("P0002"))
     caso("normal", "deshacer el préstamo automático P0002", "disponibilidad", 1, disp(gr))
 
     gp.deshacer()
     caso("normal", "deshacer otra vez", "estado de P0001 (devolución revertida)", "Activo",
-         gp.buscar_prestamo("P0001").estado)
+         gp.buscarPrestamo("P0001").estado)
     caso("normal", "deshacer otra vez", "disponibilidad", 0, disp(gr))
     caso("normal", "deshacer otra vez", "fila (sin cambios)", ["U002", "U003"], fila(gt))
 
-    # atender_siguiente_turno directo, como en el script del prompt (sin recurso R0005 especial)
+    # atenderSiguienteTurno directo, como en el script del prompt (sin recurso R0005 especial)
     gu2, gr2, gt2, gp2 = sistema(0)
-    gt2.solicitar_turno("U002", "R0001", "Centro")
-    gt2.solicitar_turno("U003", "R0001", "Centro")
+    gt2.solicitarTurno("U002", "R0001", "Centro")
+    gt2.solicitarTurno("U003", "R0001", "Centro")
     gr2.actualizar_disponibilidad("R0001", "Centro", 1)
-    gp2.atender_siguiente_turno("R0001", "Centro")
-    caso("normal", "atender_siguiente_turno con fila [U002, U003]", "fila", ["U003"], fila(gt2))
+    gp2.atenderSiguienteTurno("R0001", "Centro")
+    caso("normal", "atenderSiguienteTurno con fila [U002, U003]", "fila", ["U003"], fila(gt2))
     gp2.deshacer()
     caso("normal", "deshacer ese préstamo", "fila (U002 vuelve al frente)", ["U002", "U003"], fila(gt2))
 
     # Un préstamo normal (sin solicitud) no toca la fila al deshacerse
     gu3, gr3, gt3, gp3 = sistema(1)
-    gp3.registrar_prestamo("U001", "R0001", "Centro")
-    gt3.solicitar_turno("U002", "R0001", "Centro")
+    gp3.registrarPrestamo("U001", "R0001", "Centro")
+    gt3.solicitarTurno("U002", "R0001", "Centro")
     gp3.deshacer()
     caso("límite", "deshacer un préstamo que no vino de la fila", "fila", ["U002"], fila(gt3))
     caso("límite", "pila vacía", "deshacer()", False, gp3.deshacer())
@@ -571,13 +571,13 @@ def main():
     print("=" * 70)
 
     pruebas = [
-        ("E1  Listar préstamos activos", test_e1_listar_activos),
+        ("E1  Listar préstamos activos", test_e1_listarActivos),
         ("E2  ValueError capturados en el menú", test_e2_errores_capturados),
         ("E3  Préstamo según unidades de la sede", test_e3_disponibilidad_por_sede),
         ("E4  Inventario en préstamo/devolución/deshacer", test_e4_inventario),
         ("E5  Devolución inexistente", test_e5_devolucion_inexistente),
-        ("E6a Solicitar turno", test_e6a_solicitar_turno),
-        ("E6b Ver siguiente sin sacar", test_e6b_ver_siguiente),
+        ("E6a Solicitar turno", test_e6a_solicitarTurno),
+        ("E6b Ver siguiente sin sacar", test_e6b_verSiguiente),
         ("E6c Atender la fila al devolver", test_e6c_atender_al_devolver),
         ("E7  Categoría repetida", test_e7_categoria_repetida),
         ("E8  Informes", test_e8_informes),

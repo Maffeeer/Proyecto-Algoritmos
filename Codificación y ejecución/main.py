@@ -257,7 +257,7 @@ def gestionUsuarios(gestor):
                 print(f"\n{usuario.codigo}: {usuario.nombre}")
                 print(f"Email: {usuario.email}")
                 print(f"Estado: {usuario.estado}")
-                print(f"Prestamos: {usuario.cantidad_prestamos}")
+                print(f"Prestamos: {usuario.cantidadPrestamos}")
             else:
                 print(f"\nUsuario {codigo} no encontrado")
 
@@ -627,8 +627,8 @@ def pruebasEstructuras():
     ld.agregarAlFinal(1)
     ld.agregarAlFinal(2)
     ld.agregarAlFinal(3)
-    print(f"   Adelante: {ld.recorrer_adelante()}")
-    print(f"   Atras:    {ld.recorrer_atras()}")
+    print(f"   Adelante: {ld.recorrerAdelante()}")
+    print(f"   Atras:    {ld.recorrerAtras()}")
     print()
 
     print("4. PILA - LIFO (O(1) push/pop):")

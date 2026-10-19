@@ -73,7 +73,7 @@ class GestorTurnos:
         if cola is None or cola.estaVacia():
             return None
 
-        solicitud = cola.desecolar()
+        solicitud = cola.desencolar()
         if solicitud is not None:
             solicitud.otorgar()
         return solicitud
