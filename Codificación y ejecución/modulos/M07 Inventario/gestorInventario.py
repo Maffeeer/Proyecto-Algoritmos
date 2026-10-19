@@ -86,7 +86,13 @@ class gestorInventario:
         self.matriz[i][j] = max(0, cantidad)
         return True
 
-    
+    def obtenerFila(self, sede):
+        if sede not in self.mapeoSedes:
+            return []
+
+        i = self.mapeoSedes[sede]
+        return self.matriz[i][:self.contadorRecursos]
+
     
     
     
