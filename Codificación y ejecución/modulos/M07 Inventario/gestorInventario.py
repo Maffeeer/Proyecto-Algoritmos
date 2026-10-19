@@ -46,7 +46,7 @@ class gestorInventario:
 
         self.mapeoSedes[nombreSede] = indiceFila
 
-    def obtenerDsiponibilidad(self, codigoRecurso, sede):
+    def obtenerDisponibilidad(self, codigoRecurso, sede):
         if codigoRecurso not in self.mapeoRecursos or sede not in self.mapeoSedes:
             return 0
 
@@ -76,6 +76,17 @@ class gestorInventario:
         self.matriz[i][j] += 1
         return True
 
+    def actualizar(self, codigoRecurso, sede, cantidad):
+        if codigoRecurso not in self.mapeoRecursos or sede not in self.mapeoSedes:
+            return False
+
+        i = self.mapeoSedes[sede]
+        j = self.mapeoRecursos[codigoRecurso]
+
+        self.matriz[i][j] = max(0, cantidad)
+        return True
+
+    
     
     
     
