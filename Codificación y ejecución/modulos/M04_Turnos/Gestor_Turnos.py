@@ -28,6 +28,17 @@ class GestorTurnos:
         self.solicitudes.insertar(codigo, solicitud)
         return codigo
 
+    def esta_en_espera(self, usuario_codigo, recurso_codigo):
+        cola = self.colas.buscar(recurso_codigo)
+        if cola is None:
+            return False
+        for sol in cola.recorrer():
+            if sol.usuario_codigo == usuario_codigo:
+                return True
+        return False
+
+    
+
 
     
 
