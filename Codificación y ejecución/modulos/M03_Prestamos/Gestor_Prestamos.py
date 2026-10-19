@@ -159,3 +159,22 @@ class GestorPrestamos:
                 if usuario:
                     usuario.registrar_prestamo(p.codigo)
         return True
+
+    def atender_siguiente_turno(self, recurso_codigo, sede):
+        if self.gestor_turnos is None:
+            raise ValueError("GestorPrestamos no tiene GestorTurnos asociado")
+        while True:
+            sol = self.gestor_turnos.obtener_siguiente(recurso_codigo)
+            if sol is None:
+                return None
+            if self.gestor_usuarios:
+                usuario = self.gestor_usuarios.buscar_por_codigo(sol.usuario_codigo)
+                if usuario is None or not usuario.es_activo():
+                    sol.cancelar()
+                    continue
+            try:
+                return self.registrar_prestamo(sol.usuario_codigo, recurso_codigo, sede,
+                                               _solicitud=sol)
+            except ValueError:
+                self.gestor_turnos.reinsertar_al_frente(sol)
+                raise
