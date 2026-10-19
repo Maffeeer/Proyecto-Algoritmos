@@ -64,3 +64,26 @@ class GestorPrestamos:
  
             if not self.gestor_recursos.decrementar_disponibilidad(recurso_codigo, sede):
                 raise SinUnidadesError(f"Sin unidades disponibles de {recurso_codigo} en {sede}")
+            
+        self.contador_codigos += 1
+        codigo = f"P{self.contador_codigos:04d}"
+        prestamo = Prestamo(codigo, usuario_codigo, recurso_codigo, sede,
+                            fecha_prestamo, dias_limite)
+ 
+        self.prestamos.agregar(prestamo)
+        self.historial_simple.agregar_al_final(prestamo)
+        self.historial_doble.agregar_al_final(prestamo)
+        self.indice_codigo.insertar(codigo, prestamo)
+        self._indexar_activo(prestamo)
+ 
+        if self.gestor_usuarios:
+            usuario = self.gestor_usuarios.buscar_por_codigo(usuario_codigo)
+            if usuario:
+                usuario.registrar_prestamo(codigo)
+ 
+        self.pila_deshacer.push({
+            'operacion': 'registrar_prestamo',
+            'prestamo': prestamo,
+            'solicitud': _solicitud,
+        })
+        return codigo
