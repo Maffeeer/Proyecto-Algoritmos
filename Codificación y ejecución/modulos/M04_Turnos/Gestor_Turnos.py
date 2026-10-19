@@ -62,6 +62,22 @@ class GestorTurnos:
  
         return self.encolar(usuario_codigo, recurso_codigo)
 
+    def ver_siguiente(self, recurso_codigo):
+        cola = self.colas.buscar(recurso_codigo)
+        if cola is None:
+            return None
+        return cola.frente()
+
+    def obtener_siguiente(self, recurso_codigo):
+        cola = self.colas.buscar(recurso_codigo)
+        if cola is None or cola.esta_vacia():
+            return None
+
+        solicitud = cola.desecolar()
+        if solicitud is not None:
+            solicitud.otorgar()
+        return solicitud
+
 
 
     
