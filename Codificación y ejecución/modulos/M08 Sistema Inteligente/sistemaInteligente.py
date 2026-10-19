@@ -85,15 +85,28 @@ class SistemaInteligente:
             'fecha': datetime.now()
         })
 
-    def registrar_calificacion(self, usuario_codigo, recurso_codigo, estrellas, comentario=""):
-        """Registra una calificación (1-5 estrellas)."""
+    # Obtiene el promedio de calificaciones para un recurso específico
+    def registrarCalificacion(self, codigoUsuario, codigoRecurso, estrellas, comentario=""):
         if not 1 <= estrellas <= 5:
             raise ValueError("Estrellas deben estar entre 1 y 5")
 
         self.calificaciones.agregar({
-            'usuario': usuario_codigo,
-            'recurso': recurso_codigo,
+            'usuario': codigoUsuario,
+            'recurso': codigoRecurso,
             'estrellas': estrellas,
             'comentario': comentario,
             'fecha': datetime.now()
         })
+
+    # Obtiene el promedio de calificaciones para un recurso específico
+    def obtenerPromedioxRecurso(self, codigoRecurso):
+        suma = 0
+        cantidad = 0
+
+        for i in range(self.calificaciones.obtenerTamaño()):
+            cal = self.calificaciones.obtener(i)
+            if cal['recurso'] == codigoRecurso:
+                suma += cal['estrellas']
+                cantidad += 1
+
+        return suma / cantidad if cantidad > 0 else 0.0
