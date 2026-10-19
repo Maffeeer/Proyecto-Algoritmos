@@ -1,6 +1,6 @@
 class Ordenamientos:
     @staticmethod
-    def bubble_sort(arr, clave=lambda x: x):
+    def bubbleSort(arr, clave=lambda x: x):
         arrCopia = arr.copy()
         for i in range(len(arrCopia)):
             for j in range(len(arrCopia)-1-i):
@@ -9,7 +9,7 @@ class Ordenamientos:
         return arrCopia
 
     @staticmethod
-    def quick_sort(arr, clave=lambda x: x, izq=0, der=None):
+    def quickSort(arr, clave=lambda x: x, izq=0, der=None):
         if der is None:
             der = len(arr) - 1
 
@@ -37,29 +37,29 @@ class GeneradorInformes:
 
     # ______Reportes______
 
-    def generar_reporte_uso(self):
+    def generarReporteUso(self):
         if not self.gestorPrestamos:
             return "sin datos"
         total = self.gestorPrestamos.obtener_cantidad()
         return f"total de préstamos registrados: {total}"
 
-    def generar_reporte_inventario(self):
+    def generarReporteInventario(self):
         if not self.gestorRecursos:
             return "sin datos"
         return str(self.gestorRecursos)
 
-    #______listados_______
+    # listados
 
-    def listar_recursos_ordenados_nombre(self, recursos):
-        return Ordenamientos.bubble_sort(recursos.copy(), lambda r: r.nombre)
+    def listarRecursosOrdenadosNombre(self, recursos):
+        return Ordenamientos.bubbleSort(recursos.copy(), lambda r: r.nombre)
 
-    def listar_recursos_ordenados_prestamos(self, recursos):
-        return Ordenamientos.bubble_sort(recursos.copy(), lambda r: -r.cantidadPrestamos)
+    def listarRecursosOrdenadosPrestamos(self, recursos):
+        return Ordenamientos.bubbleSort(recursos.copy(), lambda r: -r.cantidadPrestamos)
 
-    def listar_usuarios_ordenados_nombre(self, usuarios):
-        return Ordenamientos.bubble_sort(usuarios.copy(), lambda u: u.nombre)
+    def listarUsuariosOrdenadosNombre(self, usuarios):
+        return Ordenamientos.bubbleSort(usuarios.copy(), lambda u: u.nombre)
 
-    def obtener_ordenamientos(self):
+    def obtenerOrdenamientos(self):
         return Ordenamientos
 
     

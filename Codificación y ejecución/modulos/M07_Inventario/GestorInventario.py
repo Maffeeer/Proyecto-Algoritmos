@@ -41,6 +41,9 @@ class GestorInventario:
             return idx
         return self.mapeoRecursos[codigoRecurso]
 
+    def registrarRecurso(self, codigoRecurso, nombreRecurso):
+        return self._registrarRecurso(codigoRecurso, nombreRecurso)
+
     #Registra una sede en el mapeo si no existe
     def registrarSede(self, indiceFila, nombreSede):
         if indiceFila >= self.numSedes:

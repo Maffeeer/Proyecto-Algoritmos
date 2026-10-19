@@ -10,90 +10,90 @@ from .libro import Libro
 from .equipo import Equipo
 from .sala import Sala
 from .sede import Sede
-from modulos.M07_inventario import GestorInventario
+from modulos.M07_Inventario import GestorInventario
 
 
 class GestorRecursos:
-    def __init__(self, num_sedes=10):
-        self.recursos = VectorDinamico(capacidad_inicial=20) # 20 recursos iniciales
+    def __init__(self, numSedes=10):
+        self.recursos = VectorDinamico(capacidadInicial=20) # 20 recursos iniciales
         self.indice = TablaHash(tamaño=100)  # Búsqueda O(1) por código
-        self.contador_codigos = 0
-        self.codigos_usados = set()
+        self.contadorCodigos = 0
+        self.codigosUsados = set()
         self.sedes = TablaHash(tamaño=50)
-        self.contador_sedes = 0
-        self.inventario = GestorInventario(num_sedes=num_sedes, num_recursos=100)
+        self.contadorSedes = 0
+        self.inventario = GestorInventario(numSedes=numSedes, numRecursos=100)
 
-    def _generar_codigo(self): # Genera un codigo unico para cada recurso
-        self.contador_codigos += 1
-        codigo = f"R{self.contador_codigos:04d}"
-        self.codigos_usados.add(codigo)
+    def _generarCodigo(self): # Genera un codigo unico para cada recurso
+        self.contadorCodigos += 1
+        codigo = f"R{self.contadorCodigos:04d}"
+        self.codigosUsados.add(codigo)
         return codigo
 
-    def registrar_libro(self, nombre, autor, isbn, año_publicacion): # Registra un nuevo libro, herencia de recurso
-        codigo = self._generar_codigo()
-        libro = Libro(codigo, nombre, autor, isbn, año_publicacion) 
+    def registrarLibro(self, nombre, autor, isbn, añoPublicacion): # Registra un nuevo libro, herencia de recurso
+        codigo = self._generarCodigo()
+        libro = Libro(codigo, nombre, autor, isbn, añoPublicacion) 
         self.recursos.agregar(libro)
         self.indice.insertar(codigo, libro)  # Indexar para búsqueda O(1)
         return codigo
 
-    def registrar_equipo(self, nombre, tipo_equipo, modelo, ubicacion): # Registra un nuevo equipo, herencia de recurso
-        codigo = self._generar_codigo()
-        equipo = Equipo(codigo, nombre, tipo_equipo, modelo, ubicacion)
+    def registrarEquipo(self, nombre, tipoEquipo, modelo, ubicacion): # Registra un nuevo equipo, herencia de recurso
+        codigo = self._generarCodigo()
+        equipo = Equipo(codigo, nombre, tipoEquipo, modelo, ubicacion)
         self.recursos.agregar(equipo)
         self.indice.insertar(codigo, equipo)  
         return codigo
 
-    def registrar_sala(self, nombre, capacidad, recursos_disponibles=None): # Registra una nueva sala, herencia de recurso
-        codigo = self._generar_codigo()
-        sala = Sala(codigo, nombre, capacidad, recursos_disponibles)
+    def registrarSala(self, nombre, capacidad, recursosDisponibles=None): # Registra una nueva sala, herencia de recurso
+        codigo = self._generarCodigo()
+        sala = Sala(codigo, nombre, capacidad, recursosDisponibles)
         self.recursos.agregar(sala)
         self.indice.insertar(codigo, sala)  
         return codigo
 
-    def buscar_por_codigo(self, codigo): # Busca el recurso por su codigo
+    def buscarxCodigo(self, codigo): # Busca el recurso por su codigo
         return self.indice.buscar(codigo)
 
-    def dar_de_baja(self, codigo): # Desactiva un recurso
-        recurso = self.buscar_por_codigo(codigo)
+    def darDeBaja(self, codigo): # Desactiva un recurso
+        recurso = self.buscarxCodigo(codigo)
         if recurso:
-            recurso.dar_de_baja()
+            recurso.darDeBaja()
             return True
         return False
 
-    def listar_todos(self): # Lista de todos los recursos
+    def listarTodos(self): # Lista de todos los recursos
         return self.recursos.recorrer()
 
-    def listar_por_tipo(self, tipo): # Obtiene recursos de un tipo especifico, como equipo
+    def listarxTipo(self, tipo): # Obtiene recursos de un tipo especifico, como equipo
         todos = self.recursos.recorrer()
-        return [r for r in todos if r.obtener_tipo() == tipo]
+        return [r for r in todos if r.obtenerTipo() == tipo]
 
-    def obtener_cantidad(self): # Da la cantidad total 
-        return self.recursos.obtener_tamaño()
+    def obtenerCantidad(self): # Da la cantidad total 
+        return self.recursos.obtenerTamaño()
 
     # ─── GESTIÓN DE SEDES ───
 
-    def registrar_sede(self, indice_fila, nombre):
+    def registrarSede(self, indiceFila, nombre):
         
-        codigo = f"S{indice_fila:03d}"
+        codigo = f"S{indiceFila:03d}"
         sede = Sede(codigo, nombre)
         self.sedes.insertar(codigo, sede)
-        self.contador_sedes += 1
+        self.contadorSedes += 1
         # Registrar sede en inventario
-        self.inventario.registrar_sede(indice_fila, nombre)
+        self.inventario.registrarSede(indiceFila, nombre)
         return nombre
 
-    def obtener_sede(self, codigo): # Busca la sede por su codigo
+    def obtenerSede(self, codigo): # Busca la sede por su codigo
 
         return self.sedes.buscar(codigo)
 
-    def obtener_cantidad_sedes(self): # Conocer la cantidad de sedes
+    def obtenerCantidadSedes(self): # Conocer la cantidad de sedes
 
-        return self.contador_sedes
+        return self.contadorSedes
 
-    def listar_sedes(self): # Muestra todas las sedes registradas
+    def listarSedes(self): # Muestra todas las sedes registradas
 
         sedes = []
-        for codigo in self.sedes.obtener_todas_las_claves():
+        for codigo in self.sedes.obtenerTodasLasClaves():
             sede = self.sedes.buscar(codigo)
             if sede is not None:
                 sedes.append(sede)
@@ -101,28 +101,28 @@ class GestorRecursos:
 
     # ─── GESTIÓN DE DISPONIBILIDAD  ───
 
-    def registrar_recurso_en_inventario(self, codigo_recurso): # Registra un recurso en el modulo inventarios
-        recurso = self.buscar_por_codigo(codigo_recurso)
+    def registrarRecursoEnInventario(self, codigoRecurso): # Registra un recurso en el modulo inventarios
+        recurso = self.buscarxCodigo(codigoRecurso)
         if recurso:
-            self.inventario.registrar_recurso(codigo_recurso, recurso.nombre)
+            self.inventario.registrarRecurso(codigoRecurso, recurso.nombre)
             return True
         return False
 
-    def actualizar_disponibilidad(self, codigo_recurso, sede, cantidad): # Actualzia la cantidad del recurso por sede
-        self.registrar_recurso_en_inventario(codigo_recurso)
-        return self.inventario.actualizar(codigo_recurso, sede, cantidad)
+    def actualizarDisponibilidad(self, codigoRecurso, sede, cantidad): # Actualzia la cantidad del recurso por sede
+        self.registrarRecursoEnInventario(codigoRecurso)
+        return self.inventario.actualizar(codigoRecurso, sede, cantidad)
 
-    def obtener_disponibilidad(self, codigo_recurso, sede): # Obtiene la disponibilidad del recurso por sede
-        return self.inventario.obtener_disponibilidad(codigo_recurso, sede)
+    def obtenerDisponibilidad(self, codigoRecurso, sede): # Obtiene la disponibilidad del recurso por sede
+        return self.inventario.obtenerDisponibilidad(codigoRecurso, sede)
 
-    def decrementar_disponibilidad(self, codigo_recurso, sede): # Actualiza la disponibilidad despues de un prestamo
-        return self.inventario.decrementar(codigo_recurso, sede)
+    def decrementarDisponibilidad(self, codigoRecurso, sede): # Actualiza la disponibilidad despues de un prestamo
+        return self.inventario.decrementar(codigoRecurso, sede)
 
-    def incrementar_disponibilidad(self, codigo_recurso, sede): # Actualzia la disponibilidad despues de una devolución
-        return self.inventario.incrementar(codigo_recurso, sede)
+    def incrementarDisponibilidad(self, codigoRecurso, sede): # Actualzia la disponibilidad despues de una devolución
+        return self.inventario.incrementar(codigoRecurso, sede)
 
     def __str__(self):
-        libros = len(self.listar_por_tipo("Libro"))
-        equipos = len(self.listar_por_tipo("Equipo"))
-        salas = len(self.listar_por_tipo("Sala"))
+        libros = len(self.listarxTipo("Libro"))
+        equipos = len(self.listarxTipo("Equipo"))
+        salas = len(self.listarxTipo("Sala"))
         return f"GestorRecursos(libros={libros}, equipos={equipos}, salas={salas})"

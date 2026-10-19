@@ -6,43 +6,43 @@ from .recurso import Recurso
 
 
 class Equipo(Recurso):
-    def __init__(self, codigo, nombre, tipo_equipo, modelo, ubicacion):
+    def __init__(self, codigo, nombre, tipoEquipo, modelo, ubicacion):
         super().__init__(codigo, nombre) 
-        self.tipo_equipo = tipo_equipo
+        self.tipoEquipo = tipoEquipo
         self.modelo = modelo
         self.ubicacion = ubicacion
 
-    def obtener_tipo(self): # Retorna el tipo de recurso 
+    def obtenerTipo(self): # Retorna el tipo de recurso 
         return "Equipo"
 
-    def obtener_info(self): # Retorna toda la información del equipo
+    def obtenerInfo(self): # Retorna toda la información del equipo
         return {
             'codigo': self.codigo,
-            'tipo': self.obtener_tipo(),
+            'tipo': self.obtenerTipo(),
             'nombre': self.nombre,
-            'tipo_equipo': self.tipo_equipo,
+            'tipoEquipo': self.tipoEquipo,
             'modelo': self.modelo,
             'ubicacion': self.ubicacion,
             'estado': self.estado,
-            'cantidad_prestamos': self.cantidad_prestamos,
-            'fecha_registro': self.fecha_registro.strftime("%Y-%m-%d"),
-            'disponible': self.es_disponible(),
+            'cantidadPrestamos': self.cantidadPrestamos,
+            'fechaRegistro': self.fechaRegistro.strftime("%Y-%m-%d"),
+            'disponible': self.esDisponible(),
         }
 
-    def obtener_tipo_equipo(self): # Retorna el tipo de equipo
-        return self.tipo_equipo
+    def obtenerTipoEquipo(self): # Retorna el tipo de equipo
+        return self.tipoEquipo
 
-    def obtener_modelo(self):
+    def obtenerModelo(self):
         return self.modelo
 
-    def obtener_ubicacion(self):
+    def obtenerUbicacion(self):
         return self.ubicacion
 
-    def cambiar_ubicacion(self, nueva_ubicacion):
-        self.ubicacion = nueva_ubicacion
+    def cambiarUbicacion(self, nuevaUbicacion):
+        self.ubicacion = nuevaUbicacion
 
     def __str__(self):
-        return f"Equipo({self.codigo}: {self.nombre} ({self.tipo_equipo} {self.modelo}), {self.estado}, en {self.ubicacion})"
+        return f"Equipo({self.codigo}: {self.nombre} ({self.tipoEquipo} {self.modelo}), {self.estado}, en {self.ubicacion})"
 
     def __repr__(self):
-        return f"Equipo(codigo='{self.codigo}', nombre='{self.nombre}', tipo='{self.tipo_equipo}', modelo='{self.modelo}')"
+        return f"Equipo(codigo='{self.codigo}', nombre='{self.nombre}', tipo='{self.tipoEquipo}', modelo='{self.modelo}')"

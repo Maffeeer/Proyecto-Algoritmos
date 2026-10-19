@@ -6,7 +6,7 @@ from .recurso import Recurso
 
 class Libro(Recurso):
 
-    def __init__(self, codigo, nombre, autor, isbn, año_publicacion): # Atributos de clase libro
+    def __init__(self, codigo, nombre, autor, isbn, añoPublicacion): # Atributos de clase libro
 
         # Llamar al constructor de la clase padre
         super().__init__(codigo, nombre)
@@ -14,36 +14,36 @@ class Libro(Recurso):
         # Atributos específicos del libro
         self.autor = autor
         self.isbn = isbn
-        self.año_publicacion = año_publicacion
+        self.añoPublicacion = añoPublicacion
 
-    def obtener_tipo(self): # Retorna el tipo de recurso, en este caso libro
+    def obtenerTipo(self): # Retorna el tipo de recurso, en este caso libro
         return "Libro"
 
-    def obtener_info(self): # Retorna la informacion del recurso
+    def obtenerInfo(self): # Retorna la informacion del recurso
         return {
             'codigo': self.codigo,
-            'tipo': self.obtener_tipo(),
+            'tipo': self.obtenerTipo(),
             'nombre': self.nombre,
             'autor': self.autor,
             'isbn': self.isbn,
-            'año_publicacion': self.año_publicacion,
+            'añoPublicacion': self.añoPublicacion,
             'estado': self.estado,
-            'cantidad_prestamos': self.cantidad_prestamos,
-            'fecha_registro': self.fecha_registro.strftime("%Y-%m-%d"),
-            'disponible': self.es_disponible(),
+            'cantidadPrestamos': self.cantidadPrestamos,
+            'fechaRegistro': self.fechaRegistro.strftime("%Y-%m-%d"),
+            'disponible': self.esDisponible(),
         }
 
-    def obtener_autor(self): # retorna el autor
+    def obtenerAutor(self): # retorna el autor
         return self.autor
 
-    def obtener_isbn(self): # retorna el ISBN
+    def obtenerIsbn(self): # retorna el ISBN
         return self.isbn
 
-    def obtener_año(self): # retorna el año de publicacion
-        return self.año_publicacion
+    def obtenerAño(self): # retorna el año de publicacion
+        return self.añoPublicacion
 
     def __str__(self): # Ordena toda la informacion del recurso
         return f"Libro({self.codigo}: '{self.nombre}' by {self.autor}, ISBN {self.isbn}, {self.estado})"
 
     def __repr__(self):
-        return f"Libro(codigo='{self.codigo}', nombre='{self.nombre}', autor='{self.autor}', isbn='{self.isbn}', año={self.año_publicacion})"
+        return f"Libro(codigo='{self.codigo}', nombre='{self.nombre}', autor='{self.autor}', isbn='{self.isbn}', año={self.añoPublicacion})"

@@ -2,10 +2,10 @@ from datetime import datetime
 
 class Solicitud:
 
-    def _init__(self, codigo, usuario_codigo, recurso_codigo, fecha=None):
+    def _init__(self, codigo, codigoUsuario, codigoRecurso, fecha=None):
         self.codigo = codigo
-        self.usuario_codigo = usuario_codigo
-        self.recurso_codigo = recurso_codigo
+        self.codigoUsuario = codigoUsuario
+        self.codigoRecurso = codigoRecurso
         self.fecha = fecha if fecha else datetime.now()
         self.estado = "En espera"
 

@@ -3,8 +3,7 @@ from .libro import Libro
 from .equipo import Equipo
 from .sala import Sala
 from .sede import Sede
-from .inventario import Inventario
-from .gestor_recursos import GestorRecursos
+from .gestor_recurso import GestorRecursos
 
 __all__ = [
     'Recurso',
@@ -12,6 +11,5 @@ __all__ = [
     'Equipo',
     'Sala',
     'Sede',
-    'Inventario',
     'GestorRecursos',
 ]

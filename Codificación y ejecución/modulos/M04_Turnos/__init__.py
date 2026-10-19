@@ -1,3 +1,3 @@
-from .solicitud import Solicitud
-from .gestor_turnos import GestorTurnos
+from .Solicitud import Solicitud
+from .Gestor_Turnos import GestorTurnos
 __all__ = ['Solicitud', 'GestorTurnos']

@@ -1,76 +1,76 @@
 from estructuras import ColaFIFO, TablaHash
-from .solicitud import Solicitud
+from .Solicitud import Solicitud
  
  
 class GestorTurnos:
  
-    def __init__(self, gestor_usuarios=None, gestor_recursos=None):
+    def __init__(self, gestorUsuarios=None, gestorRecursos=None):
         self.colas = TablaHash(211)
         self.solicitudes = TablaHash(211)
         self.contador = 0
-        self.gestor_usuarios = gestor_usuarios
-        self.gestor_recursos = gestor_recursos
+        self.gestorUsuarios = gestorUsuarios
+        self.gestorRecursos = gestorRecursos
  
     @staticmethod
-    def _par(usuario_codigo, recurso_codigo):
-        return f"{usuario_codigo}|{recurso_codigo}"
+    def _par(codigoUsuario, codigoRecurso):
+        return f"{codigoUsuario}|{codigoRecurso}"
 
-    def encolar(self, usuario_codigo, recurso_codigo):
-        cola = self.colas.buscar(recurso_codigo)
+    def encolar(self, codigoUsuario, codigoRecurso):
+        cola = self.colas.buscar(codigoRecurso)
         if cola is None:
             cola = ColaFIFO()
-            self.colas.insertar(recurso_codigo, cola)
+            self.colas.insertar(codigoRecurso, cola)
 
         self.contador =+ 1
         codigo = f"S{self.contador: 04d}"
-        solicitud = Solicitud(codigo, usuario_codigo,recurso_codigo)
+        solicitud = Solicitud(codigo, codigoUsuario, codigoRecurso)
         cola.encolar(solicitud)
         self.solicitudes.insertar(codigo, solicitud)
         return codigo
 
-    def esta_en_espera(self, usuario_codigo, recurso_codigo):
-        cola = self.colas.buscar(recurso_codigo)
+    def estaEnEspera(self, codigoUsuario, codigoRecurso):
+        cola = self.colas.buscar(codigoRecurso)
         if cola is None:
             return False
         for sol in cola.recorrer():
-            if sol.usuario_codigo == usuario_codigo:
+            if sol.usuario_codigo == codigoUsuario:
                 return True
         return False
 
-    def solicitar_turno(self, usuario_codigo, recurso_codigo, sede):
-        if self.gestor_usuarios:
-            usuario = self.gestor_usuarios.buscar_por_codigo(usuario_codigo)
+    def solicitarTurno(self, codigoUsuario, codigoRecurso, sede):
+        if self.gestorUsuarios:
+            usuario = self.gestorUsuarios.buscarxCodigo(codigoUsuario)
             if usuario is None:
-                raise ValueError(f"Usuario {usuario_codigo} no existe")
-            if not usuario.es_activo():
-                raise ValueError(f"El usuario {usuario_codigo} esta inactivo")
+                raise ValueError(f"Usuario {codigoUsuario} no existe")
+            if not usuario.esActivo():
+                raise ValueError(f"El usuario {codigoUsuario} esta inactivo")
  
-        if self.gestor_recursos:
-            recurso = self.gestor_recursos.buscar_por_codigo(recurso_codigo)
+        if self.gestorRecursos:
+            recurso = self.gestorRecursos.buscarxCodigo(codigoRecurso)
             if recurso is None:
-                raise ValueError(f"Recurso {recurso_codigo} no existe")
+                raise ValueError(f"Recurso {codigoRecurso} no existe")
             if recurso.obtener_estado() == "Dado de baja":
-                raise ValueError(f"El recurso {recurso_codigo} esta dado de baja")
-            sede_existe = any(s.nombre == sede for s in self.gestor_recursos.listar_sedes())
+                raise ValueError(f"El recurso {codigoRecurso} esta dado de baja")
+            sede_existe = any(s.nombre == sede for s in self.gestorRecursos.listar_sedes())
             if not sede_existe:
                 raise ValueError(f"Sede '{sede}' no existe")
-            if self.gestor_recursos.obtener_disponibilidad(recurso_codigo, sede) > 0:
+            if self.gestorRecursos.obtener_disponibilidad(codigoRecurso, sede) > 0:
                 raise ValueError("Hay unidades disponibles: registre el préstamo")
  
-        if self.esta_en_espera(usuario_codigo, recurso_codigo):
-            raise ValueError(f"El usuario {usuario_codigo} ya esta en la fila de {recurso_codigo}")
+        if self.estaEnEspera(codigoUsuario, codigoRecurso):
+            raise ValueError(f"El usuario {codigoUsuario} ya esta en la fila de {codigoRecurso}")
  
-        return self.encolar(usuario_codigo, recurso_codigo)
+        return self.encolar(codigoUsuario, codigoRecurso)
 
-    def ver_siguiente(self, recurso_codigo):
-        cola = self.colas.buscar(recurso_codigo)
+    def verSiguiente(self, codigoRecurso):
+        cola = self.colas.buscar(codigoRecurso)
         if cola is None:
             return None
         return cola.frente()
 
-    def obtener_siguiente(self, recurso_codigo):
-        cola = self.colas.buscar(recurso_codigo)
-        if cola is None or cola.esta_vacia():
+    def obtenerSiguiente(self, codigoRecurso):
+        cola = self.colas.buscar(codigoRecurso)
+        if cola is None or cola.estaVacia():
             return None
 
         solicitud = cola.desecolar()
@@ -78,62 +78,62 @@ class GestorTurnos:
             solicitud.otorgar()
         return solicitud
 
-    def obtener_fila(self, recurso_codigo):
-        cola = self.colas.buscar(recurso_codigo)
+    def obtenerFila(self, codigoRecurso):
+        cola = self.colas.buscar(codigoRecurso)
         if cola is None:
             return []
         return cola.recorrer()
  
-    def obtener_cantidad_espera(self, recurso_codigo):
-        cola = self.colas.buscar(recurso_codigo)
+    def obtenerCantidadEspera(self, codigoRecurso):
+        cola = self.colas.buscar(codigoRecurso)
         if cola is None:
             return 0
-        return cola.obtener_tamaño()
+        return cola.obtenerTamaño()
 
-    def cancelar_solicitud(self, codigo_solicitud):
-        solicitud = self.solicitudes.buscar(codigo_solicitud)
+    def cancelarSolicitud(self, codigoSolicitud):
+        solicitud = self.solicitudes.buscar(codigoSolicitud)
         if solicitud is None or solicitud.estado != "En espera":
             return False
  
-        cola = self.colas.buscar(solicitud.recurso_codigo)
+        cola = self.colas.buscar(solicitud.codigoRecurso)
         if cola is not None:
-            nueva_cola = ColaFIFO()
+            nuevaCola = ColaFIFO()
             for sol in cola.recorrer():
-                if sol.codigo != codigo_solicitud:
-                    nueva_cola.encolar(sol)
-            self.colas.insertar(solicitud.recurso_codigo, nueva_cola)
+                if sol.codigo != codigoSolicitud:
+                    nuevaCola.encolar(sol)
+            self.colas.insertar(solicitud.codigoRecurso, nuevaCola)
  
         solicitud.cancelar()
         return True
 
-    def reinsertar_al_frente(self, solicitud):
-        cola = self.colas.buscar(solicitud.recurso_codigo)
+    def reinsertarAlFrente(self, solicitud):
+        cola = self.colas.buscar(solicitud.codigoRecurso)
         if cola is None:
             cola = ColaFIFO()
  
-        nueva_cola = ColaFIFO()
-        nueva_cola.encolar(solicitud)
+        nuevaCola = ColaFIFO()
+        nuevaCola.encolar(solicitud)
         for sol in (cola.recorrer() if cola is not None else []):
             if sol.codigo != solicitud.codigo:
-                nueva_cola.encolar(sol)
+                nuevaCola.encolar(sol)
  
-        self.colas.insertar(solicitud.recurso_codigo, nueva_cola)
+        self.colas.insertar(solicitud.codigoRecurso, nuevaCola)
         solicitud.reiniciar()
 
-    def obtener_cantidad(self):
+    def obtenerCantidad(self):
         total = 0
-        for recurso_codigo in self.colas.obtener_todas_las_claves():
-            cola = self.colas.buscar(recurso_codigo)
+        for codigoRecurso in self.colas.obtener_todas_las_claves():
+            cola = self.colas.buscar(codigoRecurso)
             if cola is not None:
-                total += cola.obtener_tamaño()
+                total += cola.obtenerTamaño()
         return total
 
-    def buscar_solicitud(self, codigo):
+    def buscarSolicitud(self, codigo):
         return self.solicitudes.buscar(codigo)
  
     def __str__(self):
-        cantidad = self.obtener_cantidad()
-        return f"GestorTurnos(colas={len(self.colas.obtener_todas_las_claves())}, en_espera={cantidad})"
+        cantidad = self.obtenerCantidad()
+        return f"GestorTurnos(colas={len(self.colas.obtenerTodasLasClaves())}, en_espera={cantidad})"
 
 
     

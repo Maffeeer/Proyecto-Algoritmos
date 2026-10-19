@@ -27,7 +27,7 @@ class GestorUsuarios:
 
         return codigo  # Devolver el código del usuario registrado
 
-    def buscar_usuario(self, codigo):
+    def buscarUsuario(self, codigo):
         #busqueda lineal en el vector dinámico
         usuariosLista = self.usuarios.recorrer()
         for usuario in usuariosLista:
@@ -36,43 +36,43 @@ class GestorUsuarios:
         return None  # Devolver None si no se encuentra el usuario
 
     def actualizar(self, codigo, nuevoEmail):
-        usuario = self.buscar_usuario(codigo)
+        usuario = self.buscarUsuario(codigo)
         if usuario:
             usuario.email = nuevoEmail
             return True  # Actualización exitosa
         return False  # Usuario no encontrado
 
-    def dar_de_baja(self, codigo):
-        usuario = self.buscar_usuario(codigo)
+    def darDeBaja(self, codigo):
+        usuario = self.buscarUsuario(codigo)
         if usuario:
             if usuario.cantidadPrestamos > 0:
                 raise ValueError(f"No se puede dar de baja al usuario {codigo}: tiene {usuario.cantidadPrestamos} préstamos activos.")
-            usuario.dar_de_baja()
+            usuario.darDeBaja()
             return True  # Baja exitosa
         return False  # Usuario no encontrado
 
     def reactivar(self, codigo):
-        usuario = self.buscar_usuario(codigo)
-        if usuario and not usuario.es_activo():
+        usuario = self.buscarUsuario(codigo)
+        if usuario and not usuario.esActivo():
             usuario.reactivar()
             return True  # Reactivación exitosa
         return False  # Usuario no encontrado o ya activo
 
-    def listar_todos(self):
+    def listarTodos(self):
         return self.usuarios.recorrer()  # Devolver la lista de todos los usuarios
 
-    def listar_activos(self):
+    def listarActivos(self):
         todos = self.usuarios.recorrer()
-        return [u for u in todos if u.es_activo()]  # Devolver solo los usuarios activos
+        return [u for u in todos if u.esActivo()]  # Devolver solo los usuarios activos
 
-    def codigo_existe(self, codigo):
+    def codigoExiste(self, codigo):
         return codigo in self.codigosUsados  
 
-    def obtener_cantidad(self):
+    def obtenerCantidad(self):
         return self.usuarios.obtenerTamaño()
 
-    def obtener_cantidad_activos(self):
-        return len(self.listar_activos())
+    def obtenerCantidadActivos(self):
+        return len(self.listarActivos())
 
     def limpiar(self):
         self.usuarios.limpiar()
@@ -80,8 +80,8 @@ class GestorUsuarios:
         self.codigosUsados.clear()
 
     def __str__(self):
-        activos = self.obtener_cantidad_activos()
-        total = self.obtener_cantidad()
+        activos = self.obtenerCantidad_activos()
+        total = self.obtenerCantidad()
         return f"GestorUsuarios(total={total}, activos={activos})"
            
     

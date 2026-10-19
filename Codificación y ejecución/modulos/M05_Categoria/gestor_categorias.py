@@ -22,7 +22,7 @@ class GestorCategorias:
         self.arbol = ArbolBinario()
         self.categorias = TablaHash(211)  # código -> Categoria
 
-    def registrar_categoria(self, codigo, nombre):
+    def registrarCategoria(self, codigo, nombre):
         if self.categorias.contiene(codigo): # comprueba que eñ codigo ya exista, en ese caso da error
             raise ValueError(f"La categoria {codigo} ya existe")
         cat = Categoria(codigo, nombre)
@@ -30,8 +30,8 @@ class GestorCategorias:
         self.arbol.insertar(codigo, lambda nuevo, existente: -1 if nuevo < existente else (1 if nuevo > existente else 0))
         return codigo
 
-    def obtener_categoria(self, codigo):
+    def obtenerCategoria(self, codigo):
         return self.categorias.buscar(codigo)
 
-    def obtener_cantidad(self):
+    def obtenerCantidad(self):
         return self.categorias.obtener_cantidad()

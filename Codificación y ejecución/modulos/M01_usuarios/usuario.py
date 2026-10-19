@@ -10,39 +10,39 @@ class Usuario:
         self.cantidadPrestamos = 0
         self.historialPrestamos = []
 
-    def registrar_prestamo(self, codigoPrestamo):
+    def registrarPrestamo(self, codigoPrestamo):
         if codigoPrestamo not in self.historialPrestamos:
             self.historialPrestamos.append(codigoPrestamo)
             self.cantidadPrestamos += 1
 
-    def devolver_prestamo(self, codigoPrestamo):
+    def devolverPrestamo(self, codigoPrestamo):
         if codigoPrestamo in self.historialPrestamos:
             self.historialPrestamos.remove(codigoPrestamo)
             self.cantidadPrestamos = max(0, self.cantidadPrestamos - 1)
             return True
         return False
 
-    def actualizar_email(self, nuevoEmail):
+    def actualizarEmail(self, nuevoEmail):
         self.email = nuevoEmail
 
-    def dar_de_baja(self):
+    def darDeBaja(self):
         self.estado = "Inactivo"
 
     def reactivar(self):
         self.estado = "Activo"
 
-    def es_activo(self):
+    def esActivo(self):
         return self.estado == "Activo"
 
-    def obtener_informacion(self):
+    def obtenerInformacion(self):
         return {
             "codigo": self.codigo,
             "nombre": self.nombre,
             "email": self.email,
-            "fecha_registro": self.fechaRegistro,
+            "fechaRegistro": self.fechaRegistro,
             "estado": self.estado,
-            "cantidad_prestamos": self.cantidadPrestamos,
-            "historial_prestamos": self.historialPrestamos
+            "cantidadPrestamos": self.cantidadPrestamos,
+            "historialPrestamos": self.historialPrestamos
         }
 
     def __str__(self):
