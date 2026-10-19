@@ -1,9 +1,6 @@
 #La clase gestorInventario gestiona la disponibilidad de los
 #recursos por sede, usando matriz [i][j]
 
-from wcwidth import ljust
-
-
 class gestorInventario:
 
     #Inicializador 
@@ -108,7 +105,7 @@ class gestorInventario:
         recursosOrdenados = sorted(self.mapeoRecursos.items(), key=lambda x: x[1])
 
         #Encabezado
-        linea = "sede \\ recurso"ljust(15)
+        linea = "sede \\ recurso".ljust(15)
         for codigo, idx in recursosOrdenados:
             linea += f"{codigo}".ljust(8)
         resultado = linea + "\n"
