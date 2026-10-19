@@ -93,6 +93,12 @@ class gestorInventario:
         i = self.mapeoSedes[sede]
         return self.matriz[i][:self.contadorRecursos]
 
-    
+    def obtenerColumna(self, codigoRecurso):
+        if codigoRecurso not in self.mapeoRecursos:
+            return []
+
+        j = self.mapeoRecursos[codigoRecurso]
+        return [self.matriz[i][j] for i in range(self.numSedes)]
+
     
     
