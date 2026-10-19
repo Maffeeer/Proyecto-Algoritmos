@@ -45,4 +45,14 @@ class gestorInventario:
             raise ValueError("Índice de sede fuera de rango")
 
         self.mapeoSedes[nombreSede] = indiceFila
+
+    def obtenerDsiponibilidad(self, codigoRecurso, sede):
+        if codigoRecurso not in self.mapeoRecursos or sede not in self.mapeoSedes:
+            return 0
+
+        i = self.mapeoSedes[sede]
+        j = self.mapeoRecursos[codigoRecurso]
+        return self.matriz[i][j]
+
+    
     
