@@ -41,4 +41,4 @@ class Prestamo:
         }
 
     def __str__(self):
-        return f"Prestamo({self.codigo}: {self.usuario_codigo} ← {self.recurso_codigo}, {self.estado})"
+        return f"Prestamo({self.codigo}: {self.usuario_codigo} ← {self.recurso_codigo}, {self.estado})" 
