@@ -172,6 +172,22 @@ class SistemaInteligente:
             'devolucionesTiempo': 0
         }
 
+    # Gamificación: Agrega puntos a un usuario y actualiza su nivel
+    def agregar_puntos(self, codigoUsuario, cantidad):
+        """Agrega puntos a usuario y actualiza nivel."""
+        if codigoUsuario not in self.usuariosGamificados:
+            self.crearUsuarioGamificado(codigoUsuario)
+
+        usuario = self.usuariosGamificados[codigoUsuario]
+        usuario['puntos'] += cantidad
+
+        puntosNivel = {1: 0, 2: 100, 3: 250, 4: 500, 5: 1000,
+                       6: 1500, 7: 2000, 8: 3000, 9: 4000, 10: 5000}
+        for nivel in range(10, 0, -1):
+            if usuario['puntos'] >= puntosNivel[nivel]:
+                usuario['nivel'] = nivel
+                break
+
 
 
 
