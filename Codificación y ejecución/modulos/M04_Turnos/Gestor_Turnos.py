@@ -106,6 +106,20 @@ class GestorTurnos:
         solicitud.cancelar()
         return True
 
+    def reinsertar_al_frente(self, solicitud):
+        cola = self.colas.buscar(solicitud.recurso_codigo)
+        if cola is None:
+            cola = ColaFIFO()
+ 
+        nueva_cola = ColaFIFO()
+        nueva_cola.encolar(solicitud)
+        for sol in (cola.recorrer() if cola is not None else []):
+            if sol.codigo != solicitud.codigo:
+                nueva_cola.encolar(sol)
+ 
+        self.colas.insertar(solicitud.recurso_codigo, nueva_cola)
+        solicitud.reiniciar()
+
 
 
     
