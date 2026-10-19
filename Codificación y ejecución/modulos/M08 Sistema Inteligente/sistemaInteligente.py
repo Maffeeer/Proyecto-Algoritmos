@@ -228,3 +228,22 @@ class SistemaInteligente:
 
         return self.usuariosGamificados[codigoUsuario]
 
+    # Gamificación: Estadísticas globales del sistema
+    def estadisticas(self):
+        totalUsuarios = len(self.usuariosGamificados)
+        if totalUsuarios == 0:
+            return {
+                'totalUsuarios': 0,
+                'promedioPuntos': 0,
+                'promedioNivel': 0
+            }
+
+        sumaPuntos = sum(u['puntos'] for u in self.usuariosGamificados.values())
+        sumaNiveles = sum(u['nivel'] for u in self.usuariosGamificados.values())
+
+        return {
+            'totalUsuarios': totalUsuarios,
+            'promedioPuntos': sumaPuntos / totalUsuarios,
+            'promedioNivel': sumaNiveles / totalUsuarios
+        }
+
