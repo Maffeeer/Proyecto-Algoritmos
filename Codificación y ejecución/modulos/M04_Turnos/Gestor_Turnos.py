@@ -78,6 +78,18 @@ class GestorTurnos:
             solicitud.otorgar()
         return solicitud
 
+    def obtener_fila(self, recurso_codigo):
+        cola = self.colas.buscar(recurso_codigo)
+        if cola is None:
+            return []
+        return cola.recorrer()
+ 
+    def obtener_cantidad_espera(self, recurso_codigo):
+        cola = self.colas.buscar(recurso_codigo)
+        if cola is None:
+            return 0
+        return cola.obtener_tamaño()
+
 
 
     
