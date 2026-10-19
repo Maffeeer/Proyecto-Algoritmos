@@ -200,6 +200,17 @@ class SistemaInteligente:
         if usuario['prestamos'] >= 10:
             usuario['badges'].add('LEAL')
 
+    # Gamificación: Registra devolución a tiempo y otorga puntos y badges según la actividad
+    def registrarDevolucionTiempo(self, codigoUsuario):
+        if codigoUsuario not in self.usuariosGamificados:
+            self.crearUsuarioGamificado(codigoUsuario)
+
+        usuario = self.usuariosGamificados[codigoUsuario]
+        usuario['devolucionesTiempo'] += 1
+        self.agregar_puntos(codigoUsuario, 20)
+
+        if usuario['devolucionesTiempo'] >= 5:
+            usuario['badges'].add('DEVOLVEDOR')
 
 
 
