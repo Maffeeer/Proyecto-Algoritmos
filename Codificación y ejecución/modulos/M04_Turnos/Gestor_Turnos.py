@@ -120,6 +120,14 @@ class GestorTurnos:
         self.colas.insertar(solicitud.recurso_codigo, nueva_cola)
         solicitud.reiniciar()
 
+    def obtener_cantidad(self):
+        total = 0
+        for recurso_codigo in self.colas.obtener_todas_las_claves():
+            cola = self.colas.buscar(recurso_codigo)
+            if cola is not None:
+                total += cola.obtener_tamaño()
+        return total
+
 
 
     
