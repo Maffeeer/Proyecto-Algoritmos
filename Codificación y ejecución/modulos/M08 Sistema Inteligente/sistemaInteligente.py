@@ -212,6 +212,14 @@ class SistemaInteligente:
         if usuario['devolucionesTiempo'] >= 5:
             usuario['badges'].add('DEVOLVEDOR')
 
+    # Gamificación: Retorna top N usuarios por puntos
+    def leaderboard(self, top_n=10):
+        ranking = []
+        for codigoUser, data in self.usuariosGamificados.items():
+            ranking.append((codigoUser, data['puntos'], data['nivel']))
+
+        ranking.sort(key=lambda x: x[1], reverse=True)
+        return ranking[:top_n]
 
 
 
