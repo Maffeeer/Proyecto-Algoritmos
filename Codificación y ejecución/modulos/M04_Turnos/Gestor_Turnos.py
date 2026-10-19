@@ -128,6 +128,12 @@ class GestorTurnos:
                 total += cola.obtener_tamaño()
         return total
 
+    def buscar_solicitud(self, codigo):
+        return self.solicitudes.buscar(codigo)
+ 
+    def __str__(self):
+        cantidad = self.obtener_cantidad()
+        return f"GestorTurnos(colas={len(self.colas.obtener_todas_las_claves())}, en_espera={cantidad})"
 
 
     
