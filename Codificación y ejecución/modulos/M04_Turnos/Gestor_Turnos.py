@@ -14,3 +14,21 @@ class GestorTurnos:
     @staticmethod
     def _par(usuario_codigo, recurso_codigo):
         return f"{usuario_codigo}|{recurso_codigo}"
+
+    def encolar(self, usuario_codigo, recurso_codigo):
+        cola = self.colas.buscar(recurso_codigo)
+        if cola is None:
+            cola = ColaFIFO()
+            self.colas.insertar(recurso_codigo, cola)
+
+        self.contador =+ 1
+        codigo = f"S{self.contador: 04d}"
+        solicitud = Solicitud(codigo, usuario_codigo,recurso_codigo)
+        cola.encolar(solicitud)
+        self.solicitudes.insertar(codigo, solicitud)
+        return codigo
+
+
+    
+
+    
