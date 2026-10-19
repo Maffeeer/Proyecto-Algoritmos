@@ -3,20 +3,20 @@ from .usuario import Usuario
 
 class GestorUsuarios:
     def __init__(self):
-        self.usuarios = VectorDinamico(capacidad_inicial=10)
+        self.usuarios = VectorDinamico(capacidadInicial=10)
         self.contadorCodigos = 0
         self.codigosUsados = set()
 
-    def refistrar(self, nombre, email):
+    def registrar(self, nombre, email):
         #validar entrada
-        if not nombre or (isinstance(nombre, str) and nombre.strip()):
+        if not nombre or (isinstance(nombre, str) and not nombre.strip()):
             raise ValueError("El nombre no puede estar vacío.")
-        if not email or (isinstance(email, str) and email.strip()):
+        if not email or (isinstance(email, str) and not email.strip()):
             raise ValueError("El email no puede estar vacío.")
 
         #generar un código único para el usuario
         self.contadorCodigos += 1
-        codigo = f"U{self.contadorCodigos:03d}"  # Formato: U0001, U0002, etc.
+        codigo = f"U{self.contadorCodigos:03d}"  # Formato: U001, U002, etc.
 
         #crear un nuevo usuario
         usuario = Usuario(codigo, nombre, email)
@@ -69,7 +69,7 @@ class GestorUsuarios:
         return codigo in self.codigosUsados  
 
     def obtener_cantidad(self):
-        return self.usuarios.obtener_tamaño()
+        return self.usuarios.obtenerTamaño()
 
     def obtener_cantidad_activos(self):
         return len(self.listar_activos())
