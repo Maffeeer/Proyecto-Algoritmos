@@ -143,4 +143,24 @@ class SistemaInteligente:
         hora = fechaInicio.hour
         self.demandaxHora[hora] = self.demandaxHora.get(hora, 0) + 1
 
+    # Predice la disponibilidad de un recurso basado en historial de préstamos
+    def predecirDisponibilidad(self, codigoRecurso):
+        if codigoRecurso not in self.duracionesPromedio:
+            duracionProm = 3.0
+            confianza = 0.0
+        else:
+            duraciones = self.duracionesPromedio[codigoRecurso]
+            duracionProm = sum(duraciones) / len(duraciones)
+            confianza = min(len(duraciones) / 10.0, 1.0)
+
+        fechaEstimada = datetime.now() + timedelta(days=duracionProm)
+
+        return {
+            'fechaEstimada': fechaEstimada,
+            'diasEstimados': int(duracionProm),
+            'confianza': confianza,
+            'mensaje': f"Disponible en ~{int(duracionProm)} días ({int(confianza*100)}% confianza)"
+        }
+
+
 
