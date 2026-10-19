@@ -178,3 +178,35 @@ class GestorPrestamos:
             except ValueError:
                 self.gestor_turnos.reinsertar_al_frente(sol)
                 raise
+
+    def listar_activos(self):
+        activos = VectorDinamico(capacidad_inicial=10)
+        for i in range(self.prestamos.obtener_tamaño()):
+            p = self.prestamos.obtener(i)
+            if p.estado == "Activo":
+                activos.agregar(p)
+        return activos
+ 
+    def buscar_prestamo(self, codigo):
+        return self.indice_codigo.buscar(codigo)
+ 
+    def obtener_prestamos_usuario(self, usuario_codigo):
+        return [p for p in self.prestamos.recorrer()
+                if p.usuario_codigo == usuario_codigo and p.estado == "Activo"]
+ 
+    def obtener_prestamos_atrasados(self, ahora=None):
+        return [p for p in self.prestamos.recorrer() if p.esta_atrasado(ahora)]
+ 
+    def obtener_prestamos_sede(self, sede):
+        return [p for p in self.prestamos.recorrer() if p.sede == sede and p.estado == "Activo"]
+ 
+    def listar_todos(self):
+        return self.prestamos.recorrer()
+ 
+    def obtener_cantidad(self):
+        return self.prestamos.obtener_tamaño()
+ 
+    def __str__(self):
+        activos = len([p for p in self.prestamos.recorrer() if p.estado == "Activo"])
+        return f"GestorPrestamos(total={self.obtener_cantidad()}, activos={activos})"
+ 
