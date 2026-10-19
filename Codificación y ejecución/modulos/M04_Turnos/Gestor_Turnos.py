@@ -90,6 +90,22 @@ class GestorTurnos:
             return 0
         return cola.obtener_tamaño()
 
+    def cancelar_solicitud(self, codigo_solicitud):
+        solicitud = self.solicitudes.buscar(codigo_solicitud)
+        if solicitud is None or solicitud.estado != "En espera":
+            return False
+ 
+        cola = self.colas.buscar(solicitud.recurso_codigo)
+        if cola is not None:
+            nueva_cola = ColaFIFO()
+            for sol in cola.recorrer():
+                if sol.codigo != codigo_solicitud:
+                    nueva_cola.encolar(sol)
+            self.colas.insertar(solicitud.recurso_codigo, nueva_cola)
+ 
+        solicitud.cancelar()
+        return True
+
 
 
     
