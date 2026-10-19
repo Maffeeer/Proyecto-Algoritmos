@@ -66,5 +66,16 @@ class gestorInventario:
             return True
         return False
 
+    def incrementar(self, codigoRecurso, sede):
+        if codigoRecurso not in self.mapeoRecursos or sede not in self.mapeoSedes:
+            return False
+
+        i = self.mapeoSedes[sede]
+        j = self.mapeoRecursos[codigoRecurso]
+
+        self.matriz[i][j] += 1
+        return True
+
+    
     
     
