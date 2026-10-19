@@ -40,7 +40,7 @@ class gestorInventario:
         return self.mapeoRecursos[codigoRecurso]
 
     #Registra una sede en el mapeo si no existe
-    def _registrarSede(self, indiceFila, nombreSede):
+    def registrarSede(self, indiceFila, nombreSede):
         if indiceFila >= self.numSedes:
             raise ValueError("Índice de sede fuera de rango")
 
@@ -53,6 +53,18 @@ class gestorInventario:
         i = self.mapeoSedes[sede]
         j = self.mapeoRecursos[codigoRecurso]
         return self.matriz[i][j]
+
+    def decrementar(self, codigoRecurso, sede):
+        if codigoRecurso not in self.mapeoRecursos or sede not in self.mapeoSedes:
+            return False
+
+        i = self.mapeoSedes[sede]
+        j = self.mapeoRecursos[codigoRecurso]
+
+        if self.matriz[i][j] > 0:
+            self.matriz[i][j] -= 1
+            return True
+        return False
 
     
     
