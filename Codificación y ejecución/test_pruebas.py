@@ -144,6 +144,7 @@ def test_m04_turnos():
     gestor_usuarios = GestorUsuarios()
     gestor_recursos = GestorRecursos(numSedes=3)
     gestor = GestorTurnos(gestorUsuarios=gestor_usuarios, gestorRecursos=gestor_recursos)
+    gestor_recursos.registrarSede(0, "Centro")  # la sede debe existir para pedir turno
 
     gestor_usuarios.registrar("Ana", "ana@test.com")
     codigo_r = gestor_recursos.registrarLibro("Recurso1", "Autor", "ISBN", 2020)
@@ -157,6 +158,7 @@ def test_m04_turnos():
     gestor_usuarios = GestorUsuarios()
     gestor_recursos = GestorRecursos(numSedes=3)
     gestor = GestorTurnos(gestorUsuarios=gestor_usuarios, gestorRecursos=gestor_recursos)
+    gestor_recursos.registrarSede(0, "Centro")  # la sede debe existir para pedir turno
 
     for i in range(5):
         gestor_usuarios.registrar(f"User_{i}", f"user{i}@test.com")
@@ -177,12 +179,13 @@ def test_m04_turnos():
     gestor_usuarios = GestorUsuarios()
     gestor_recursos = GestorRecursos(numSedes=3)
     gestor = GestorTurnos(gestorUsuarios=gestor_usuarios, gestorRecursos=gestor_recursos)
+    gestor_recursos.registrarSede(0, "Centro")  # la sede debe existir para pedir turno
 
     codigo_r = gestor_recursos.registrarLibro("MuyPopular", "Autor", "ISBN", 2020)
 
     for i in range(500):
         gestor_usuarios.registrar(f"User_{i}", f"user{i}@test.com")
-        gestor.solicitarTurno(f"U{i+1:04d}", codigo_r, "Centro")
+        gestor.solicitarTurno(f"U{i+1:03d}", codigo_r, "Centro")
 
     cantidad = gestor.obtenerCantidadEspera(codigo_r)
     assert cantidad == 500
