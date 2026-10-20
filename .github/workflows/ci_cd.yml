@@ -1,0 +1,80 @@
+# CI/CD - Sistema de Gestión de Recursos Comunitarios (Proyecto Algoritmos)
+#
+# CI (integración continua): en cada push o pull request a main se verifica la
+#     sintaxis, se ejecutan las pruebas de test_pruebas.py y se arranca el menú.
+# CD (entrega continua): al crear una etiqueta de versión (v1.0, v2.0, ...) y solo
+#     si las pruebas pasan, se empaqueta el código y se publica como Release.
+
+name: CI-CD
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  pull_request:
+    branches: [main]
+
+env:
+  PYTHONIOENCODING: utf-8
+  CODIGO: "Codificación y ejecución"
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  pruebas:
+    name: Pruebas (${{ matrix.os }}, Python ${{ matrix.python }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        python: ["3.9", "3.11", "3.13"]
+    steps:
+      - name: Descargar el código
+        uses: actions/checkout@v4
+
+      - name: Instalar Python ${{ matrix.python }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+
+      - name: Instalar pytest
+        run: python -m pip install --upgrade pip pytest
+
+      - name: Verificar sintaxis de todos los módulos
+        working-directory: ${{ env.CODIGO }}
+        run: python -m compileall -q estructuras modulos main.py test_pruebas.py
+
+      - name: Pruebas por módulo (exitoso, borde y cuello de botella)
+        working-directory: ${{ env.CODIGO }}
+        run: python -m pytest test_pruebas.py -v
+
+      - name: Arranque del menú principal
+        working-directory: ${{ env.CODIGO }}
+        run: echo "0" | python main.py
+
+  entrega:
+    name: Entrega continua (Release)
+    needs: pruebas
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Descargar el código
+        uses: actions/checkout@v4
+
+      - name: Empaquetar el sistema
+        run: |
+          cd "$CODIGO"
+          zip -r "../proyecto-algoritmos-${GITHUB_REF_NAME}.zip" \
+            main.py estructuras modulos test_pruebas.py COMO_EJECUTAR.md PRUEBAS.md \
+            -x "*__pycache__*" "*.DS_Store"
+
+      - name: Publicar Release en GitHub
+        uses: softprops/action-gh-release@v2
+        with:
+          files: proyecto-algoritmos-*.zip
+          generate_release_notes: true
