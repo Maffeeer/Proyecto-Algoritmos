@@ -17,20 +17,3 @@ El menú principal permite acceder a:
 
 Selecciona `0` para salir o volver desde los submenús.
 
-## Ejecutar las pruebas
-
-```bash
-python main.py
-```
-
-Para las pruebas:
-
-```bash
-python pruebas/test_basico.py
-python pruebas/test_correcciones_menu.py
-```
-
-La primera prueba estructuras de datos, herencia y gestores básicos. La segunda
-comprueba correcciones de préstamos, devoluciones, turnos, inventario, categorías
-e informes.
-

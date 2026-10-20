@@ -6,7 +6,6 @@ from modulos import (GestorUsuarios, GestorRecursos, GestorPrestamos, GestorTurn
 from modulos.M03_Prestamos import SinUnidadesError
 from estructuras import (VectorDinamico, ListaSimple, ListaDoble, Pila, ColaFIFO,
                          TablaHash, ArbolBinario)
-from evidencia import ejecutarEvidencia
 from datetime import datetime, timedelta
 
 
@@ -56,9 +55,6 @@ def menuPrincipal():
     print()
     print("  9. Funciones Inteligentes (M08)")
     print("     Recomendaciones, calificaciones, prediccion y gamificacion")
-    print()
-    print(" 10. Evidencia de eficiencia (Entrega 1 vs Entrega 2)")
-    print("     Mide en vivo: busqueda, funcion hash y ordenamientos")
     print()
     print("  0. Salir")
     print()
@@ -766,11 +762,6 @@ def main():
 
         elif opcion == "9":
             menuFuncionesInteligentes(sistemaInteligente, gestorRecursos, gestorUsuarios)
-
-        elif opcion == "10":
-            limpiarPantalla()
-            ejecutarEvidencia()
-            pausa()
 
         else:
             print("\nOpcion invalida")
